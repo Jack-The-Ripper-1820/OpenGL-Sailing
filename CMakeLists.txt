@@ -11,8 +11,33 @@ endif()
 
 project ("OpenGL-Sailing")
 
+# Set the source directory
+set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+
+
 # Add source to this project's executable.
-add_executable (OpenGL-Sailing "OpenGL-Sailing.cpp" "OpenGL-Sailing.h")
+add_executable (OpenGL-Sailing
+    "${SRC_DIR}/main.cpp"
+)
+
+# Include directories for dependencies
+add_subdirectory(dependencies/glfw)
+add_subdirectory(dependencies/glm)
+add_subdirectory(dependencies/assimp)
+
+target_include_directories(OpenGL-Sailing PRIVATE
+    "${SRC_DIR}"
+    "${CMAKE_SOURCE_DIR}/dependencies/glfw/include"
+    "${CMAKE_SOURCE_DIR}/dependencies/glm"
+    "${CMAKE_SOURCE_DIR}/dependencies/assimp/include"
+)
+
+target_link_libraries(
+    OpenGL-Sailing
+    glfw
+    glm
+    assimp
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OpenGL-Sailing PROPERTY CXX_STANDARD 20)
