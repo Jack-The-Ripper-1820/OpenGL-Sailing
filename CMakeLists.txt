@@ -24,12 +24,16 @@ add_executable (OpenGL-Sailing
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 add_subdirectory(dependencies/assimp)
+add_subdirectory(dependencies/glew)
+
 
 target_include_directories(OpenGL-Sailing PRIVATE
     "${SRC_DIR}"
     "${CMAKE_SOURCE_DIR}/dependencies/glfw/include"
     "${CMAKE_SOURCE_DIR}/dependencies/glm"
     "${CMAKE_SOURCE_DIR}/dependencies/assimp/include"
+    "${CMAKE_SOURCE_DIR}/dependencies/glew/include" 
+
 )
 
 target_link_libraries(
@@ -37,6 +41,7 @@ target_link_libraries(
     glfw
     glm
     assimp
+    libglew_static
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
