@@ -14,10 +14,20 @@ project ("OpenGL-Sailing")
 # Set the source directory
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
+# Add source files from the common folder
+file(GLOB COMMON_SRC
+    "${SRC_DIR}/common/*.cpp"
+    "${SRC_DIR}/common/*.hpp"
+)
+
+file(GLOB SHADER_FILES "${SRC_DIR}/shaders/*.glsl")
+
 
 # Add source to this project's executable.
 add_executable (OpenGL-Sailing
     "${SRC_DIR}/main.cpp"
+    ${COMMON_SRC}
+    ${SHADER_FILES}
 )
 
 # Include directories for dependencies
@@ -26,14 +36,21 @@ add_subdirectory(dependencies/glm)
 add_subdirectory(dependencies/assimp)
 add_subdirectory(dependencies/glew)
 
+foreach(SHADER_FILE ${SHADER_FILES})
+    get_filename_component(SHADER_FILENAME ${SHADER_FILE} NAME)
+    configure_file(${SHADER_FILE} ${CMAKE_BINARY_DIR}/shaders/${SHADER_FILENAME} COPYONLY)
+endforeach()
 
-target_include_directories(OpenGL-Sailing PRIVATE
+
+target_include_directories(OpenGL-Sailing PUBLIC
     "${SRC_DIR}"
+    "${CMAKE_BINARY_DIR}/shaders"
     "${CMAKE_SOURCE_DIR}/dependencies/glfw/include"
     "${CMAKE_SOURCE_DIR}/dependencies/glm"
     "${CMAKE_SOURCE_DIR}/dependencies/assimp/include"
     "${CMAKE_SOURCE_DIR}/dependencies/glew/include" 
-
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
+    "${SRC_DIR}/common" 
 )
 
 target_link_libraries(
