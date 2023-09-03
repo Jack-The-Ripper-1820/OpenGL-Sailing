@@ -9,6 +9,8 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+#set(CMAKE_TOOLCHAIN_FILE "C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
 project ("OpenGL-Sailing")
 
 # Set the source directory
@@ -21,7 +23,6 @@ file(GLOB COMMON_SRC
 )
 
 file(GLOB SHADER_FILES "${SRC_DIR}/shaders/*.glsl")
-
 
 # Add source to this project's executable.
 add_executable (OpenGL-Sailing
