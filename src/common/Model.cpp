@@ -15,7 +15,7 @@ void Model::RenderModel()
 			textureList[materialIndex]->UseTexture();
 		}
 
-		meshList[i]->RenderMeshTriangles();
+		meshList[i]->RenderMesh();
 	}
 }
 
@@ -55,6 +55,14 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 
 	for (size_t i = 0; i < mesh->mNumVertices; i++) {
 		vertices.insert(vertices.end(), { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z });
+		
+		if (mesh->mColors[0]) {
+			vertices.insert(vertices.end(), { mesh->mColors[0][i].r, mesh->mColors[0][i].g, mesh->mColors[0][i].b});
+		}
+
+		else {
+			vertices.insert(vertices.end(), { 1.0f, 1.0f, 1.0f });
+		}
 
 		if (mesh->mTextureCoords[0]) {
 			vertices.insert(vertices.end(), { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y });
@@ -62,14 +70,14 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 		else {
 			vertices.insert(vertices.end(), { 0.0f, 0.0f });
 		}
-
+		
 		vertices.insert(vertices.end(), { -mesh->mNormals[i].x, -mesh->mNormals[i].y, -mesh->mNormals[i].z });
 
 	}
 
 	for (size_t i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];
-
+		
 		for (size_t j = 0; j < face.mNumIndices; j++) {
 			indices.push_back(face.mIndices[j]);
 		}

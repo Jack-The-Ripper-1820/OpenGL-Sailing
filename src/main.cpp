@@ -15,6 +15,7 @@
 #include <Texture.hpp>
 #include <Camera.hpp>
 #include <Utils.hpp>
+#include <Model.hpp>
 
 using namespace std;
 
@@ -24,12 +25,12 @@ Camera camera;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
 
-
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
 
 GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
 
+Model boat;
 
 const int gridSize = 4;
 const float gridSpacing = 1.0f;
@@ -43,6 +44,7 @@ unsigned int axesIndices[] = {
 };
 
 GLfloat axesVertices[] = {
+	// x   y      z     r      g     b     u    v    nx   ny   nz
 	0.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
 	1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
 	0.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
@@ -113,6 +115,8 @@ void CreateObjects()
 	Mesh* oceanMesh = new Mesh();
 	oceanMesh->CreateMesh(oceanVertices, oceanIndices, (gridSize + 1) * (gridSize + 1) * 11, gridSize * gridSize * 6);
 	meshList.push_back(oceanMesh);
+
+
 }
 
 
@@ -137,7 +141,14 @@ void RenderScene() {
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	meshList[1]->RenderMeshTriangles(); //ocean
+	meshList[1]->RenderMesh(); //ocean
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(3.0f, 0.2f, 3.0f));
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	boat.RenderModel(); //boat
+
 }
 
 void AxesRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
@@ -175,7 +186,8 @@ int main()
 
 	camera = Camera(glm::vec3(11.0f, 2.0f, 11.0f), glm::vec3(0.0f, 1.0f, 0.0f), -135.0f, 0.0f, 5.0f, 0.5f);
 
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
+	boat = Model();
+	boat.LoadModel("models/boat.obj");
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
 

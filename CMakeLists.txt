@@ -18,11 +18,15 @@ set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
 # Add source files from the common folder
 file(GLOB COMMON_SRC
-    "${SRC_DIR}/common/*.cpp"
-    "${SRC_DIR}/common/*.hpp"
+    "${SRC_DIR}/common/*.*"
 )
 
-file(GLOB SHADER_FILES "${SRC_DIR}/shaders/*.glsl")
+file(GLOB SHADER_FILES "${SRC_DIR}/shaders/*.*")
+
+file(GLOB MODEL_FILES "${SRC_DIR}/models/*.*")
+
+file(GLOB TEXTURE_FILES "${SRC_DIR}/textures/*.*")
+
 
 # Add source to this project's executable.
 add_executable (OpenGL-Sailing
@@ -42,6 +46,15 @@ foreach(SHADER_FILE ${SHADER_FILES})
     configure_file(${SHADER_FILE} ${CMAKE_BINARY_DIR}/shaders/${SHADER_FILENAME} COPYONLY)
 endforeach()
 
+foreach(MODEL_FILE ${MODEL_FILES})
+    get_filename_component(MODEL_FILENAME ${MODEL_FILE} NAME)
+    configure_file(${MODEL_FILE} ${CMAKE_BINARY_DIR}/models/${MODEL_FILENAME} COPYONLY)
+endforeach()
+
+foreach(TEXTURE_FILE ${TEXTURE_FILES})
+    get_filename_component(TEXTURE_FILENAME ${TEXTURE_FILE} NAME)
+    configure_file(${TEXTURE_FILE} ${CMAKE_BINARY_DIR}/textures/${TEXTURE_FILENAME} COPYONLY)
+endforeach()
 
 target_include_directories(OpenGL-Sailing PUBLIC
     "${SRC_DIR}"
