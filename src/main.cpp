@@ -25,7 +25,7 @@
 
 std::vector<Mesh*> meshList;
 
-std::vector<Shader> shaderList;
+std::vector<Shader*> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
 
@@ -62,10 +62,10 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
-static const char* vShader = "shaders/vertex.glsl";
+static const char* vShader = "shaders/tri_vert.glsl";
 static const char* fShader = "shaders/fragment.glsl";
-static const char* tcs = "shaders/tri_tess_tc.glsl";
-static const char* tes = "shaders/tri_tess_te.glsl";
+static const char* tcs = "shaders/tri_tcs.glsl";
+static const char* tes = "shaders/tri_tes.glsl";
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
@@ -207,15 +207,15 @@ void CreateShaders() {
 	std::cout << "shader1: " << shader1->GetShaderID() << std::endl;
 
 	shader1->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(*shader1);
+	shaderList.push_back(shader1);
 
-	Shader* shader2 = new Shader();
+	//Shader* shader2 = new Shader();
 
-	std::cout << "shader2: " << shader2->GetShaderID() << std::endl;
-	shader2->CreateFromFiles(vShader, fShader);
+	//std::cout << "shader2: " << shader2->GetShaderID() << std::endl;
+	//shader2->CreateFromFiles(vShader, fShader);
 
-	//shader2->CreateFromFiles(vShader, tcs, tes, fShader);
-	shaderList.push_back(*shader2);
+	////shader2->CreateFromFiles(vShader, tcs, tes, fShader);
+	//shaderList.push_back(shader2);
 
 
 	directionalShadowShader = Shader();
@@ -226,6 +226,7 @@ void CreateShaders() {
 }
 
 void RenderShader1() {
+	std::cout << uniformProjection << std::endl;
 	glm::mat4 model = glm::mat4(1.f);
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -325,15 +326,15 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
-	shaderList[0].UseShader();
+	shaderList[0]->UseShader();
 
-	uniformModel = shaderList[0].GetModelLocation();
-	uniformProjection = shaderList[0].GetProjectionLocation();
-	uniformView = shaderList[0].GetViewLocation();
-	uniformModel = shaderList[0].GetModelLocation();
-	uniformEyePosition = shaderList[0].GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-	uniformShininess = shaderList[0].GetShininessLocation();
+	uniformModel = shaderList[0]->GetModelLocation();
+	uniformProjection = shaderList[0]->GetProjectionLocation();
+	uniformView = shaderList[0]->GetViewLocation();
+	uniformModel = shaderList[0]->GetModelLocation();
+	uniformEyePosition = shaderList[0]->GetEyePositionLocation();
+	uniformSpecularIntensity = shaderList[0]->GetSpecularIntensityLocation();
+	uniformShininess = shaderList[0]->GetShininessLocation();
 	//uniformTessellationLevel = shaderList[0].GetTesslationLevelLocation();
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
@@ -341,59 +342,63 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	//glUniform1f(uniformTessellationLevel, 1.f);
 
-	shaderList[0].SetDirectionalLight(&mainLight);
-	shaderList[0].SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[0].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	shaderList[0]->SetDirectionalLight(&mainLight);
+	shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
+	shaderList[0]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
-	shaderList[0].SetDirectionalLightTransform(&lightTansform);
+	shaderList[0]->SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	shaderList[0].SetTexture(1);
-	shaderList[0].SetDirectionalShadowMap(2);
+	shaderList[0]->SetTexture(1);
+	shaderList[0]->SetDirectionalShadowMap(2);
 
 	glm::vec3 lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
-	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+	//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
-	shaderList[0].Validate();
+	shaderList[0]->Validate();
 
 	RenderShader1();
 
+	glUseProgram(0);
 
+	//shaderList[0]->ClearShader();
 
-	/*shaderList[1].UseShader();
+	//shaderList[1]->UseShader();
 
-	uniformModel = shaderList[1].GetModelLocation();
-	uniformProjection = shaderList[1].GetProjectionLocation();
-	uniformView = shaderList[1].GetViewLocation();
-	uniformModel = shaderList[1].GetModelLocation();
-	uniformEyePosition = shaderList[1].GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[1].GetSpecularIntensityLocation();
-	uniformShininess = shaderList[1].GetShininessLocation();
-	uniformTessellationLevel = shaderList[1].GetTesslationLevelLocation();
+	//uniformModel = shaderList[1]->GetModelLocation();
+	//uniformProjection = shaderList[1]->GetProjectionLocation();
+	//uniformView = shaderList[1]->GetViewLocation();
+	//uniformModel = shaderList[1]->GetModelLocation();
+	//uniformEyePosition = shaderList[1]->GetEyePositionLocation();
+	//uniformSpecularIntensity = shaderList[1]->GetSpecularIntensityLocation();
+	//uniformShininess = shaderList[1]->GetShininessLocation();
+	//uniformTessellationLevel = shaderList[1]->GetTesslationLevelLocation();
 
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	glUniform1f(uniformTessellationLevel, 1.f);
+	//glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	//glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	//glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+	//glUniform1f(uniformTessellationLevel, 1.f);
 
-	shaderList[1].SetDirectionalLight(&mainLight);
-	shaderList[1].SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[1].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
-	lightTansform = mainLight.CalcLightTransform();
-	shaderList[1].SetDirectionalLightTransform(&lightTansform);
+	//shaderList[1]->SetDirectionalLight(&mainLight);
+	//shaderList[1]->SetPointLights(pointLights, pointLightCount, 3, 0);
+	//shaderList[1]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	//lightTansform = mainLight.CalcLightTransform();
+	//shaderList[1]->SetDirectionalLightTransform(&lightTansform);
 
-	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	shaderList[1].SetTexture(1);
-	shaderList[1].SetDirectionalShadowMap(2);
+	//mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+	//shaderList[1]->SetTexture(1);
+	//shaderList[1]->SetDirectionalShadowMap(2);
 
-	lowerLight = camera.getCameraPosition();
-	lowerLight.y -= 0.3f;
-	spotLights[1].SetFlash(lowerLight, camera.getCameraDirection());
+	//lowerLight = camera.getCameraPosition();
+	//lowerLight.y -= 0.3f;
+	////spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
-	shaderList[1].Validate();
+	//shaderList[1]->Validate();
 
-	RenderShader2(model);*/
+	//RenderShader2();
+
+	//shaderList[1]->ClearShader();
 }
 
 

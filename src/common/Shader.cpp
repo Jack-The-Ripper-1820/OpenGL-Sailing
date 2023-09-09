@@ -228,6 +228,7 @@ void Shader::CompileProgram()
 	if (!result) {
 		glGetProgramInfoLog(shaderID, sizeof(eLog), NULL, eLog);
 		printf("Error linking program: '%s'\n", eLog);
+		std::exit(0);
 		return;
 	}
 
@@ -332,9 +333,16 @@ void Shader::CompileShader(const char* vertexCode, const char* tessControlCode, 
 	}
 
 	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	std::cout << "vs worked" << std::endl;
+
 	AddShader(shaderID, tessControlCode, GL_TESS_CONTROL_SHADER);
+	std::cout << "tcs worked" << std::endl;
+
 	AddShader(shaderID, tessEvalCode, GL_TESS_EVALUATION_SHADER);
+	std::cout << "tes worked" << std::endl;
+
 	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+	std::cout << "fs worked" << std::endl;
 
 	CompileProgram();
 }
@@ -359,6 +367,7 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 	{
 		glGetShaderInfoLog(theShader, 1024, NULL, eLog);
 		fprintf(stderr, "Error compiling the %d shader: '%s'\n", shaderType, eLog);
+		std::exit(0);
 		return;
 	}
 

@@ -4,7 +4,7 @@ in vec4 vCol;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
-in vec4 DirectionalLightSpacePos;
+flat in vec4 DirectionalLightSpacePos;
 
 out vec4 color;
 
