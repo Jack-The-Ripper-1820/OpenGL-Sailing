@@ -47,7 +47,7 @@ struct OutputPatch
     vec4 Color[3];
 };
 
-layout(vertices = 3) in;
+//layout(vertices = 3) in;
 
 layout(vertices = 3) out;
 
@@ -98,12 +98,12 @@ void main() {
     float wt31 = dot(t1 - t3, vec2(n3));
     float wt13 = dot(t3 - t1, vec2(n1));
 
-    float wc12 = dot(c2 - c1, vec4(n1));
-    float wc21 = dot(c1 - c2, vec4(n2));
-    float wc23 = dot(c3 - c2, vec4(n2));
-    float wc32 = dot(c2 - c3, vec4(n3));
-    float wc31 = dot(c1 - c3, vec4(n3));
-    float wc13 = dot(c3 - c1, vec4(n1));
+    float wc12 = dot(c2 - c1, vec4(n1, 1));
+    float wc21 = dot(c1 - c2, vec4(n2, 1));
+    float wc23 = dot(c3 - c2, vec4(n2, 1));
+    float wc32 = dot(c2 - c3, vec4(n3, 1));
+    float wc31 = dot(c1 - c3, vec4(n3, 1));
+    float wc13 = dot(c3 - c1, vec4(n1, 1));
 
     vec3 b210 = (2. * p1 + p2 - w12 * n1) / 3.;
     vec3 b120 = (2. * p2 + p1 - w21 * n2) / 3.;
@@ -119,12 +119,12 @@ void main() {
     vec2 t102 = (2. * t3 + t1 - wt31 * vec2(n3)) / 3.;
     vec2 t201 = (2. * t1 + t3 - wt13 * vec2(n1)) / 3.;
 
-    vec4 c210 = (2. * c1 + c2 - wc12 * vec4(n1)) / 3.;
-    vec4 c120 = (2. * c2 + c1 - wc21 * vec4(n2)) / 3.;
-    vec4 c021 = (2. * c2 + c3 - wc23 * vec4(n2)) / 3.;
-    vec4 c012 = (2. * c3 + c2 - wc32 * vec4(n3)) / 3.;
-    vec4 c102 = (2. * c3 + c1 - wc31 * vec4(n3)) / 3.;
-    vec4 c201 = (2. * c1 + c3 - wc13 * vec4(n1)) / 3.;
+    vec4 c210 = (2. * c1 + c2 - wc12 * vec4(n1, 1)) / 3.;
+    vec4 c120 = (2. * c2 + c1 - wc21 * vec4(n2, 1)) / 3.;
+    vec4 c021 = (2. * c2 + c3 - wc23 * vec4(n2, 1)) / 3.;
+    vec4 c012 = (2. * c3 + c2 - wc32 * vec4(n3, 1)) / 3.;
+    vec4 c102 = (2. * c3 + c1 - wc31 * vec4(n3, 1)) / 3.;
+    vec4 c201 = (2. * c1 + c3 - wc13 * vec4(n1, 1)) / 3.;
 
     vec3 e = (b120 + b120 + b021 + b012 + b102 + b210) / 6.;
     vec3 v = (p1 + p2 + p3) / 3.;
@@ -134,8 +134,8 @@ void main() {
     vec2 vt = (t1 + t2 + t3) / 3.;
     vec2 t111 = et + (et - vt) / 2.;
 
-    vec2 ec = (c120 + c120 + c021 + c012 + c102 + c210) / 6.;
-    vec2 vc = (c1 + c2 + c3) / 3.;
+    vec4 ec = (c120 + c120 + c021 + c012 + c102 + c210) / 6.;
+    vec4 vc = (c1 + c2 + c3) / 3.;
     vec4 c111 = ec + (ec - vc) / 2.;
 
     oPatch.B021 = b021;

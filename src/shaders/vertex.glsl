@@ -18,17 +18,15 @@ uniform mat4 directionalLightTransform;
 
 void main()
 {
+	gl_Position = projection * view * model * vec4(pos, 1.0);
+
 	vCol = vec4(clamp(col, 0.0f, 1.0f), 1.0f);
 
 	DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
 
 	TexCoord = tex;
-
-	Normal = norm;
 	
-	FragPos = pos;
+	Normal = mat3(transpose(inverse(model))) * norm;
 
-	//Normal = mat3(transpose(inverse(model))) * norm;
-
-	//FragPos = (model * vec4(pos, 1.0)).xyz;
+	FragPos = (model * vec4(pos, 1.0)).xyz;
 }

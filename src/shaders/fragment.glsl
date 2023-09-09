@@ -1,4 +1,4 @@
-#version 330
+#version 440
 
 in vec4 vCol;
 in vec2 TexCoord;
@@ -224,5 +224,7 @@ void main()
 	finalColor += CalcPointLights();
 	finalColor += CalcSpotLights();
 
-	color = texture(theTexture, TexCoord) * finalColor * vCol;
+	vec4 texColor = texture(theTexture, TexCoord);
+	
+	color = texColor * finalColor;
 }

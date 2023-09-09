@@ -21,6 +21,8 @@ public:
 	void CreateFromString(const char* vertexCode, const char* fragmentCode);
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
+	void CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation);
+
 
 	void Validate();
 
@@ -37,6 +39,8 @@ public:
 	GLuint GetPointLightCount();
 	GLuint GetOmniLightPosLocation();
 	GLuint GetFarPlaneLocation();
+	GLuint GetTesslationLevelLocation();
+	GLuint GetShaderID();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -45,6 +49,7 @@ public:
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalLightTransform(glm::mat4* lightTransform);
 	void SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices);
+	void SetTessellationLevel(float level);
 
 	void UseShader();
 	void ClearShader();
@@ -62,7 +67,8 @@ private:
 		uniformDirectionalLightTransform,
 		uniformTexture,
 		uniformOmniLightPos,
-		uniformFarPlane;
+		uniformFarPlane,
+		uniformTessellationLevel;
 
 	GLuint uniformLightMatrices[6];
 
@@ -104,5 +110,6 @@ private:
 	void CompileProgram();
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
 	void CompileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
+	void CompileShader(const char* vertexCode, const char* tessControlCode, const char* tessEvalCode, const char* fragmentCode);
 	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 };

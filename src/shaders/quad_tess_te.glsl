@@ -61,13 +61,13 @@ struct OutputPatch
 layout(quads, equal_spacing, ccw) in;
 
 in patch OutputPatch oPatch;
-in vec4 DirectionalLightSpacePos;
+//in vec4 DirectionalLightSpacePos;
 
 out vec4 vCol;
 out vec2 TexCoord;
 out vec4 Normal;
 out vec4 FragPos;
-out vec4 DirectionalLightSpacePos;
+//out vec4 DirectionalLightSpacePos;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -142,10 +142,12 @@ void main() {
 
     gl_Position = projection * view * model * vec4(pos, 1.0);
 
-    FragPos = (model * vec4(pos, 1.0)).xyz;
+    //FragPos = (model * vec4(pos, 1.0)).xyz;
 
-    Normal = mat3(transpose(inverse(model))) * norm;
+    FragPos = pos;
 
-    DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
+    Normal = norm;
+
+   // DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
 
 }

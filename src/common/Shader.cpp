@@ -37,6 +37,21 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLoc
 	CompileShader(vertexCode, geometryCode, fragmentCode);
 }
 
+void Shader::CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation)
+{
+	std::string vertexString = ReadFile(vertexLocation);
+	std::string tessControlString = ReadFile(tessControlLocation);
+	std::string tesseEvalString = ReadFile(tessEvalLocation);
+	std::string fragmentString = ReadFile(fragmentLocation);
+
+	const char* vertexCode = vertexString.c_str();
+	const char* tessControlCode = tessControlString.c_str();
+	const char* tessEvalCode = tesseEvalString.c_str();
+	const char* fragmentCode = fragmentString.c_str();
+
+	CompileShader(vertexCode, tessControlCode, tessEvalCode, fragmentCode);
+}
+
 void Shader::Validate()
 {
 	GLint result = 0;
@@ -125,6 +140,16 @@ GLuint Shader::GetFarPlaneLocation()
 	return uniformFarPlane;
 }
 
+GLuint Shader::GetTesslationLevelLocation()
+{
+	return uniformTessellationLevel;
+}
+
+GLuint Shader::GetShaderID()
+{
+	return shaderID;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -186,6 +211,11 @@ void Shader::SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices)
 	for (size_t i = 0; i < 6; i++) {
 		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(lightMatrices[i]));
 	}
+}
+
+void Shader::SetTessellationLevel(float level)
+{
+	glUniform1f(uniformTessellationLevel, level);
 }
 
 void Shader::CompileProgram()
@@ -254,8 +284,10 @@ void Shader::CompileProgram()
 	for (size_t i = 0; i < N_POINT_LIGHTS + N_SPOT_LIGHTS; i++) {
 		uniformOmniShadowMap[i].uniformShadowMap = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].shadowMap", i).c_str());
 		uniformOmniShadowMap[i].uniformFarPlane = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].farPlane", i).c_str());
-
 	}
+
+	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
+	
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {
@@ -289,6 +321,24 @@ void Shader::CompileShader(const char* vertexCode, const char* geometryCode, con
 	CompileProgram();
 }
 
+void Shader::CompileShader(const char* vertexCode, const char* tessControlCode, const char* tessEvalCode, const char* fragmentCode)
+{
+	shaderID = glCreateProgram();
+
+	if (!shaderID)
+	{
+		printf("Error creating shader program!\n");
+		return;
+	}
+
+	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	AddShader(shaderID, tessControlCode, GL_TESS_CONTROL_SHADER);
+	AddShader(shaderID, tessEvalCode, GL_TESS_EVALUATION_SHADER);
+	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+
+	CompileProgram();
+}
+
 void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
 	GLuint theShader = glCreateShader(shaderType);
 
@@ -316,6 +366,7 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 }
 
 void Shader::UseShader() {
+	std::cout << "using: " << shaderID << std::endl;
 	glUseProgram(shaderID);
 }
 

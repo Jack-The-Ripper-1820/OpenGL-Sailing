@@ -25,8 +25,23 @@ file(GLOB SHADER_FILES "${SRC_DIR}/shaders/*.*")
 
 file(GLOB MODEL_FILES "${SRC_DIR}/models/*.*")
 
-file(GLOB TEXTURE_FILES "${SRC_DIR}/textures/*.*")
+# Recursive function to find all files in a directory and its subdirectories
+function(copy_all_files sourceDir destinationDir)
+    file(GLOB children RELATIVE ${sourceDir} ${sourceDir}/*)
+    foreach(child ${children})
+        if(IS_DIRECTORY ${sourceDir}/${child})
+            # Create a corresponding directory in the destination folder
+            file(MAKE_DIRECTORY ${destinationDir}/${child})
+            copy_all_files(${sourceDir}/${child} ${destinationDir}/${child})
+        else()
+            # Copy the file to the destination folder
+            configure_file(${sourceDir}/${child} ${destinationDir}/${child} COPYONLY)
+        endif()
+    endforeach()
+endfunction()
 
+# Copy all texture files and directories recursively to the build directory
+copy_all_files("${SRC_DIR}/textures" "${CMAKE_BINARY_DIR}/textures")
 
 # Add source to this project's executable.
 add_executable (OpenGL-Sailing
@@ -49,11 +64,6 @@ endforeach()
 foreach(MODEL_FILE ${MODEL_FILES})
     get_filename_component(MODEL_FILENAME ${MODEL_FILE} NAME)
     configure_file(${MODEL_FILE} ${CMAKE_BINARY_DIR}/models/${MODEL_FILENAME} COPYONLY)
-endforeach()
-
-foreach(TEXTURE_FILE ${TEXTURE_FILES})
-    get_filename_component(TEXTURE_FILENAME ${TEXTURE_FILE} NAME)
-    configure_file(${TEXTURE_FILE} ${CMAKE_BINARY_DIR}/textures/${TEXTURE_FILENAME} COPYONLY)
 endforeach()
 
 target_include_directories(OpenGL-Sailing PUBLIC

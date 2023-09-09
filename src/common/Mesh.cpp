@@ -39,7 +39,9 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 	glBindVertexArray(0);
 }
 
-void Mesh::RenderMesh() {
+
+void Mesh::RenderMesh(bool bWireFrame) {
+	bWireFrame ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
@@ -47,7 +49,8 @@ void Mesh::RenderMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::RenderMeshLines() {
+void Mesh::RenderMeshLines(bool bWireFrame) {
+	bWireFrame ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, 0);

@@ -7,8 +7,8 @@ public:
 	Mesh();
 
 	void CreateMesh(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numOfIndices);
-	void RenderMesh();
-	void RenderMeshLines();
+	void RenderMesh(bool bWireFrame = false);
+	void RenderMeshLines(bool bWireFrame = false);
 	void ClearMesh();
 
 	~Mesh();
