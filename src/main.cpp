@@ -50,6 +50,7 @@ SpotLight spotLights[N_SPOT_LIGHTS];
 
 GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
+float tessLevel = 1.f;
 
 bool direction = true;
 float triOffset = 0.0f;
@@ -73,6 +74,8 @@ static const char* ptv = "shaders/tri_vert.glsl";
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
+
+bool bWireFrame = false;
 
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0,
@@ -136,7 +139,7 @@ void CreateShaders() {
 	shaderList.push_back(shader2);*/
 
 	Shader* shader3 = new Shader();
-	shader3->CreateFromFiles(vShader, tcs, tes, fShader);
+	shader3->CreateFromFiles(ptv, ptcs, ptes, fShader);
 	shaderList.push_back(shader3);
 
 	directionalShadowShader = Shader();
@@ -186,28 +189,28 @@ void RenderSceneTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMeshPatches();
+	meshList[0]->RenderMeshPatches(bWireFrame);
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMeshPatches();
+	meshList[1]->RenderMeshPatches(bWireFrame);
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMeshPatches();
+	meshList[2]->RenderMeshPatches(bWireFrame);
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
 	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat.RenderModelPatches();
+	boat.RenderModelPatches(bWireFrame);
 
 	glUseProgram(0);
 }
@@ -260,6 +263,8 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
+	//glUseProgram(0);
+
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	shaderList[0]->UseShader();
@@ -280,7 +285,11 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	glUniform1f(uniformTessellationLevel, 5.f);
+	
+	std::cout << tessLevel << std::endl;
+
+	shaderList[0]->SetTessellationLevel(tessLevel);
+	//glUniform1f(uniformTessellationLevel, tessLevel);
 
 	shaderList[0]->SetDirectionalLight(&mainLight);
 	shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
@@ -407,6 +416,23 @@ int main() {
 			spotLights[0].Toggle();
 			mainWindow.getKeys()[GLFW_KEY_L] = false;
 		}
+
+		if (mainWindow.getKeys()[GLFW_KEY_UP]) {
+			tessLevel = std::min(tessLevel + 1, 8.f);
+			mainWindow.getKeys()[GLFW_KEY_UP] = false;
+		}
+
+		if (mainWindow.getKeys()[GLFW_KEY_DOWN]) {
+			tessLevel = std::max(tessLevel - 1, 0.f);
+			mainWindow.getKeys()[GLFW_KEY_DOWN] = false;
+		}
+
+		if (mainWindow.getKeys()[GLFW_KEY_B]) {
+			bWireFrame = !bWireFrame;
+			mainWindow.getKeys()[GLFW_KEY_B] = false;
+		}
+
+
 
 		DirectionalShadowMapPass(&mainLight);
 

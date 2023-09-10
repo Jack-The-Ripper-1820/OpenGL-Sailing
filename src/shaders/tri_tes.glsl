@@ -104,7 +104,7 @@ void main() {
         oPatch.C021 * 3.0 * u2 * v + oPatch.C102 * 3.0 * w * v2 + oPatch.C012 * 3.0 * u * v2 +
         oPatch.C111 * 6.0 * w * u * v;*/
 
-    //FragPos = (model * vec4(pos, 1.0)).xyz;
+    FragPos = (model * vec4(pos, 1.0)).xyz;
     TexCoord = tex;
    // Normal = norm;
     //vCol = col;
@@ -112,8 +112,8 @@ void main() {
 
     Normal = mat3(transpose(inverse(model))) * norm;
 
-    FragPos = (model * vec4(pos, 1.0)).xyz;
+    //FragPos = (model * vec4(pos, 1.0)).xyz;
 
-    gl_Position = projection * view * model * vec4(pos, 1.0);
+    gl_Position = projection* view* model* vec4(pos, 1.0);
     DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
 }

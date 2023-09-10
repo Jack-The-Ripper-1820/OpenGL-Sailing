@@ -19,7 +19,7 @@ void Model::RenderModel()
 	}
 }
 
-void Model::RenderModelPatches()
+void Model::RenderModelPatches(bool bWireFrame)
 {
 	for (size_t i = 0; i < meshList.size(); i++) {
 		unsigned int materialIndex = meshToTexture[i];
@@ -28,7 +28,7 @@ void Model::RenderModelPatches()
 			textureList[materialIndex]->UseTexture();
 		}
 
-		meshList[i]->RenderMeshPatches();
+		meshList[i]->RenderMeshPatches(bWireFrame);
 	}
 }
 

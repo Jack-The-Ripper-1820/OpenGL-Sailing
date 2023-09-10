@@ -287,8 +287,7 @@ void Shader::CompileProgram()
 		uniformOmniShadowMap[i].uniformFarPlane = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].farPlane", i).c_str());
 	}
 
-	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
-	
+	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");	
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {
