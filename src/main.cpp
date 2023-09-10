@@ -25,7 +25,7 @@
 
 std::vector<Mesh*> meshList;
 
-std::vector<Shader*> shaderList;
+std::vector<Shader> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
 
@@ -36,12 +36,11 @@ Camera camera;
 
 Material glossyMaterial, matteMaterial;
 
-Model boat;
+Model mech, bugatti, xwingPlayer, xwing;
 
 Texture brickTexture;
 Texture dirtTexture;
 Texture plainTexture;
-Texture oceanTexture;
 
 DirectionalLight mainLight;
 PointLight pointLights[N_POINT_LIGHTS];
@@ -62,25 +61,16 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
-static const char* vShader = "shaders/tri_vert.glsl";
+static const char* vShader = "shaders/vertex.glsl";
 static const char* fShader = "shaders/fragment.glsl";
-static const char* tcs = "shaders/tri_tcs.glsl";
-static const char* tes = "shaders/tri_tes.glsl";
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
 
-const int gridSize = 4;
-const float gridSpacing = 1.0f;
-GLfloat oceanVertices[(gridSize + 1) * (gridSize + 1) * 11];
-unsigned int oceanIndices[gridSize * gridSize * 6];
-
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0,
 uniformDirectionalLightTransform = 0,
-uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0;
-
-//glm::mat4 model(1.f);
+uniformOmniLightPos = 0, uniformFarPlane = 0;
 
 void CreateObjects() {
 	unsigned int indices[] = {
@@ -91,11 +81,11 @@ void CreateObjects() {
 	};
 
 	GLfloat vertices[] = {
-		//  x      y      z        r, g, b,    u      v       nx,    ny,   nz
-			-1.0f, -1.0f, -0.6f,   1,1,1,          0.0f, 0.0f,    0.0f, 0.0f, 0.0f,
-			0.0f, -1.0f, 1.0f,     1,1,1 ,         0.5f, 0.f,	  0.0f, 0.0f, 0.0f,
-			1.0f, -1.0f, -0.6f,    1,1,1,          1.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,      1,1,1,          0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
+		//  x      y      z                 u      v       nx,    ny,   nz
+			-1.0f, -1.0f, -0.6f,   1,1,1,   0.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+			0.0f, -1.0f, 1.0f,     1,1,1,   0.5f, 0.f,	  0.0f, 0.0f, 0.0f,
+			1.0f, -1.0f, -0.6f,    1,1,1,    1.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,      1,1,1,     0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
 	};
 
 	unsigned int floorIndices[] = {
@@ -104,78 +94,12 @@ void CreateObjects() {
 	};
 
 	GLfloat floorVerices[] = {
-		-10.0f, 0.0f, -10.0f,	1,1,1,     0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, -10.0f,	1,1,1,       10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
-		-10.0f, 0.0f, 10.0f,	1,1,1,      0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, 10.0f,		1,1,1,       10.0f, 10.0f,	0.0f, -1.0f, 0.0f
+		-10.0f, 0.0f, -10.0f,	1,1,1,    0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
+		10.0f, 0.0f, -10.0f,	1,1,1,    10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
+		-10.0f, 0.0f, 10.0f,	1,1,1,    0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
+		10.0f, 0.0f, 10.0f,		1,1,1,    10.0f, 10.0f,	0.0f, -1.0f, 0.0f
 	};
 
-	unsigned int axesIndices[] = {
-		0, 1, // X-axis
-		2, 3, // Y-axis
-		4, 5  // Z-axis
-	};
-
-	GLfloat axesVertices[] = {
-		// x   y      z     r      g     b     u    v    nx   ny   nz
-		0.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, 1.f, 1.f, 0.f, 0.f, 0.f,
-		1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
-		0.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
-		0.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
-		0.0f,  0.0f,  0.0f,  0.0f, 0.0f, 1.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
-		0.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.f, 0.f, 0.f, 0.f, 0.f,
-
-	};
-
-	int vertexIndex = 0;
-	int index = 0;
-	const float waveAmplitude = 0.2f; // Amplitude of the lifted points
-
-	for (int z = 0; z <= gridSize; ++z) {
-		for (int x = 0; x <= gridSize; ++x) {
-			float xPos = static_cast<float>(x) * gridSpacing;
-			float zPos = static_cast<float>(z) * gridSpacing;
-
-			// Vertex position (x, y, z)
-			oceanVertices[vertexIndex++] = 1.0f + xPos;
-			oceanVertices[vertexIndex++] = (x + z) % 2 ? waveAmplitude * sin(xPos + zPos) : 0.f;
-			oceanVertices[vertexIndex++] = 1.0f + zPos;
-
-			// Colors (r, g, b)
-			oceanVertices[vertexIndex++] = 0.0f; // r
-			oceanVertices[vertexIndex++] = 0.0f; // g
-			oceanVertices[vertexIndex++] = 1.0f; // b
-
-			// Texture coordinates (u, v)
-			oceanVertices[vertexIndex++] = 0.5f; // u
-			oceanVertices[vertexIndex++] = 0.5f; // v
-
-			// Normals (nx, ny, nz)
-			oceanVertices[vertexIndex++] = 0.0f; // nx
-			oceanVertices[vertexIndex++] = 0.0f; // ny
-			oceanVertices[vertexIndex++] = 0.0f; // nz
-
-
-
-			// Indices for triangles
-			if (x < gridSize && z < gridSize) {
-				int topLeft = (z * (gridSize + 1)) + x;
-				int topRight = topLeft + 1;
-				int bottomLeft = ((z + 1) * (gridSize + 1)) + x;
-				int bottomRight = bottomLeft + 1;
-
-				// First triangle in the quad
-				oceanIndices[index++] = topLeft;
-				oceanIndices[index++] = bottomLeft;
-				oceanIndices[index++] = topRight;
-
-				// Second triangle in the quad
-				oceanIndices[index++] = topRight;
-				oceanIndices[index++] = bottomLeft;
-				oceanIndices[index++] = bottomRight;
-			}
-		}
-	}
 
 	Utils::calcAverageNormal(indices, 12, vertices, 44, 11, 8);
 
@@ -188,35 +112,15 @@ void CreateObjects() {
 	Mesh* obj3 = new Mesh();
 	obj3->CreateMesh(floorVerices, floorIndices, 44, 6);
 
-	Mesh* obj4 = new Mesh();
-	obj4->CreateMesh(axesVertices, axesIndices, 66, 6);
-
-	Mesh* obj5 = new Mesh();
-	obj5->CreateMesh(oceanVertices, oceanIndices, (gridSize + 1)* (gridSize + 1) * 11, gridSize* gridSize * 6);
-
 	meshList.push_back(obj1);
 	meshList.push_back(obj2);
 	meshList.push_back(obj3);
-	meshList.push_back(obj4);
-	meshList.push_back(obj5);
 }
 
 void CreateShaders() {
 	Shader* shader1 = new Shader();
-
-	std::cout << "shader1: " << shader1->GetShaderID() << std::endl;
-
 	shader1->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(shader1);
-
-	//Shader* shader2 = new Shader();
-
-	//std::cout << "shader2: " << shader2->GetShaderID() << std::endl;
-	//shader2->CreateFromFiles(vShader, fShader);
-
-	////shader2->CreateFromFiles(vShader, tcs, tes, fShader);
-	//shaderList.push_back(shader2);
-
+	shaderList.push_back(*shader1);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
@@ -225,52 +129,64 @@ void CreateShaders() {
 		"shaders/omni_directional_shadow_map_fragment.glsl");
 }
 
-void RenderShader1() {
-	std::cout << uniformProjection << std::endl;
-	glm::mat4 model = glm::mat4(1.f);
+void RenderScene() {
+	glm::mat4 model(1.0f);
+
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMesh(); // prism 1
+	meshList[0]->RenderMesh();
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMesh(); // prism 2
+	meshList[1]->RenderMesh();
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMesh(); // floor 
-}
+	meshList[2]->RenderMesh();
 
-void RenderShader2() {
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
-	model = glm::rotate(model, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
-	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat.RenderModel(); // boat 
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
+	//model = glm::rotate(model, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//xwing.RenderModel();
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	brickTexture.UseTexture();
-	meshList[4]->RenderMesh(); //ocean
-}
 
-void RenderShader3() {
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	meshList[3]->RenderMeshLines(); //axes
+	///*model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(-7.5f, 0.0f, 8.0f));
+	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));*/
+
+	//glm::vec3 cameraPosition = camera.getCameraPosition();
+	//float cameraYaw = camera.GetYaw(); // Assuming the Camera class has getYaw() function
+	//glm::vec3 cameraFront = camera.getCameraDirection();
+
+	//// Adjust the position and orientation of the mech
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, cameraPosition - cameraFront * -4.f); // Adjust the offset
+	//model = glm::translate(model, glm::vec3(0.f, -0.5f, 0.f));
+	////model = glm::rotate(model, glm::radians(cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotate the model to face the camera's direction
+
+	//// Calculate the rotation to make the model face the camera's direction
+	//glm::vec3 modelForward = glm::vec3(0.0f, 0.0f, 1.0f); // Assuming the model's forward direction is +Z
+	//glm::vec3 targetDirection = glm::normalize(cameraFront);
+	//glm::quat rotation = glm::quatLookAt(targetDirection, glm::vec3(0.f, 1.f, 0.f));
+
+	//model = model * glm::mat4(rotation);
+
+
+	//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//mech.RenderModel();
 }
 
 void OmniShadowMapPass(PointLight* light) {
@@ -290,9 +206,7 @@ void OmniShadowMapPass(PointLight* light) {
 	omniShadowShader.SetOmniLightMatrices(light->CalcLightTransform());
 
 	omniShadowShader.Validate();
-
-	RenderShader1();
-	//RenderShader2(model);
+	RenderScene();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -310,10 +224,7 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	directionalShadowShader.SetDirectionalLightTransform(&lightTransform);
 
 	directionalShadowShader.Validate();
-
-
-	RenderShader1();
-	//RenderShader2(model);;
+	RenderScene();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -326,79 +237,37 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
-	shaderList[0]->UseShader();
+	shaderList[0].UseShader();
 
-	uniformModel = shaderList[0]->GetModelLocation();
-	uniformProjection = shaderList[0]->GetProjectionLocation();
-	uniformView = shaderList[0]->GetViewLocation();
-	uniformModel = shaderList[0]->GetModelLocation();
-	uniformEyePosition = shaderList[0]->GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[0]->GetSpecularIntensityLocation();
-	uniformShininess = shaderList[0]->GetShininessLocation();
-	//uniformTessellationLevel = shaderList[0].GetTesslationLevelLocation();
+	uniformModel = shaderList[0].GetModelLocation();
+	uniformProjection = shaderList[0].GetProjectionLocation();
+	uniformView = shaderList[0].GetViewLocation();
+	uniformModel = shaderList[0].GetModelLocation();
+	uniformEyePosition = shaderList[0].GetEyePositionLocation();
+	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
+	uniformShininess = shaderList[0].GetShininessLocation();
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	//glUniform1f(uniformTessellationLevel, 1.f);
 
-	shaderList[0]->SetDirectionalLight(&mainLight);
-	shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[0]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	shaderList[0].SetDirectionalLight(&mainLight);
+	shaderList[0].SetPointLights(pointLights, pointLightCount, 3, 0);
+	shaderList[0].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
-	shaderList[0]->SetDirectionalLightTransform(&lightTansform);
+	shaderList[0].SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	shaderList[0]->SetTexture(1);
-	shaderList[0]->SetDirectionalShadowMap(2);
+	shaderList[0].SetTexture(1);
+	shaderList[0].SetDirectionalShadowMap(2);
 
 	glm::vec3 lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
 	//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
-	shaderList[0]->Validate();
+	shaderList[0].Validate();
 
-	RenderShader1();
-
-	glUseProgram(0);
-
-	//shaderList[0]->ClearShader();
-
-	//shaderList[1]->UseShader();
-
-	//uniformModel = shaderList[1]->GetModelLocation();
-	//uniformProjection = shaderList[1]->GetProjectionLocation();
-	//uniformView = shaderList[1]->GetViewLocation();
-	//uniformModel = shaderList[1]->GetModelLocation();
-	//uniformEyePosition = shaderList[1]->GetEyePositionLocation();
-	//uniformSpecularIntensity = shaderList[1]->GetSpecularIntensityLocation();
-	//uniformShininess = shaderList[1]->GetShininessLocation();
-	//uniformTessellationLevel = shaderList[1]->GetTesslationLevelLocation();
-
-	//glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	//glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	//glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	//glUniform1f(uniformTessellationLevel, 1.f);
-
-	//shaderList[1]->SetDirectionalLight(&mainLight);
-	//shaderList[1]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	//shaderList[1]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
-	//lightTansform = mainLight.CalcLightTransform();
-	//shaderList[1]->SetDirectionalLightTransform(&lightTansform);
-
-	//mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	//shaderList[1]->SetTexture(1);
-	//shaderList[1]->SetDirectionalShadowMap(2);
-
-	//lowerLight = camera.getCameraPosition();
-	//lowerLight.y -= 0.3f;
-	////spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-
-	//shaderList[1]->Validate();
-
-	//RenderShader2();
-
-	//shaderList[1]->ClearShader();
+	RenderScene();
 }
 
 
@@ -417,14 +286,15 @@ int main() {
 	dirtTexture.LoadTextureA();
 	plainTexture = Texture("textures/plain.png");
 	plainTexture.LoadTextureA();
-	oceanTexture = Texture("textures/ocean.jpg");
-	oceanTexture.LoadTexture();
 
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	boat = Model();
-	boat.LoadModel("models/boat.obj");
+	/*xwing = Model();
+	xwing.LoadModel("models/x-wing.obj");
+
+	mech = Model();
+	mech.LoadModel("models/Kaiser.obj");*/
 
 	mainLight = DirectionalLight(
 		0.678f, 0.847f, 0.902f,
@@ -522,7 +392,6 @@ int main() {
 		glUseProgram(0);
 
 		mainWindow.swapBuffers();
-
 	}
 
 	return 0;

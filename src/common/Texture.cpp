@@ -48,6 +48,7 @@ bool Texture::LoadTexture()
 
 	stbi_image_free(textData);
 
+	std::cout << "texture loaded: " << fileLocation << std::endl;
 	return true;
 }
 
@@ -75,6 +76,7 @@ bool Texture::LoadTextureA()
 
 	stbi_image_free(texData);
 
+	std::cout << "texture loaded: " << fileLocation << std::endl;
 	return true;
 }
 

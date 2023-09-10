@@ -2,6 +2,7 @@
 
 #include <GL\glew.h>
 #include <stb_image.h>
+#include <iostream>
 
 class Texture {
 public:

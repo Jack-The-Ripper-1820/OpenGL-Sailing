@@ -28,23 +28,23 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 	GLfloat velocity = moveSpeed * deltaTime;
 
 	if (keys[GLFW_KEY_W]) {
-		//printf("key control: %d", GLFW_KEY_W);
+		printf("key control: %d", GLFW_KEY_W);
 		position += front * velocity;
 		//position = glm::translate(position, front * velocity);
 	}
 
 	if (keys[GLFW_KEY_S]) {
-		//printf("key control: %d", GLFW_KEY_S);
+		printf("key control: %d", GLFW_KEY_S);
 		position -= front * velocity;
 	}
 
 	if (keys[GLFW_KEY_A]) {
-		//printf("key control: %d", GLFW_KEY_A);
+		printf("key control: %d", GLFW_KEY_A);
 		position -= right * velocity;
 	}
 
 	if (keys[GLFW_KEY_D]) {
-		//printf("key control: %d", GLFW_KEY_D);
+		printf("key control: %d", GLFW_KEY_D);
 		position += right * velocity;
 	}
 }

@@ -97,6 +97,8 @@ void Skybox::DrawSkybox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	skyMesh->RenderMesh();
 
 	glDepthMask(GL_TRUE);
+
+	glUseProgram(0);
 }
 
 Skybox::~Skybox()

@@ -14,7 +14,7 @@ out vec4 DirectionalLightSpacePos;
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
-uniform mat4 directionalLightTransform;
+//uniform mat4 directionalLightTransform;
 
 void main()
 {

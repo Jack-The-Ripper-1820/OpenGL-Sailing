@@ -228,7 +228,7 @@ void Shader::CompileProgram()
 	if (!result) {
 		glGetProgramInfoLog(shaderID, sizeof(eLog), NULL, eLog);
 		printf("Error linking program: '%s'\n", eLog);
-		std::exit(0);
+		//std::exit(0);
 		return;
 	}
 
@@ -367,7 +367,7 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 	{
 		glGetShaderInfoLog(theShader, 1024, NULL, eLog);
 		fprintf(stderr, "Error compiling the %d shader: '%s'\n", shaderType, eLog);
-		std::exit(0);
+		//std::exit(0);
 		return;
 	}
 
@@ -375,7 +375,7 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 }
 
 void Shader::UseShader() {
-	std::cout << "using: " << shaderID << std::endl;
+	//std::cout << "using: " << shaderID << std::endl;
 	glUseProgram(shaderID);
 }
 
