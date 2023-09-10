@@ -300,8 +300,9 @@ void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {
 	}
 
 	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	std::cout << "shader" << std::endl;
 	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
-
+	std::cout << "frag" << std::endl;
 	CompileProgram();
 }
 
