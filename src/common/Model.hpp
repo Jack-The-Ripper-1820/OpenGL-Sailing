@@ -21,6 +21,7 @@ public:
 
 	void LoadModel(const std::string& fileName);
 	void RenderModel();
+	void RenderModelPatches();
 	void ClearModel();
 	void SetModelMatrix(glm::mat4 const& matrix) { model = matrix; }
 	~Model();

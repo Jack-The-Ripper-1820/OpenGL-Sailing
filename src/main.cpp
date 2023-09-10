@@ -23,6 +23,8 @@
 #include <Model.hpp>
 #include <Skybox.hpp>
 
+bool f = true;
+
 std::vector<Mesh*> meshList;
 
 std::vector<Shader*> shaderList;
@@ -36,7 +38,7 @@ Camera camera;
 
 Material glossyMaterial, matteMaterial;
 
-Model mech, bugatti, xwingPlayer, xwing;
+Model boat;
 
 Texture brickTexture;
 Texture dirtTexture;
@@ -62,10 +64,12 @@ float maxSize = 0.8f;
 float minSize = 0.1f;
 
 static const char* vShader = "shaders/vertex.glsl";
+static const char* tcs = "shaders/tcs.glsl";
+static const char* tes = "shaders/tes.glsl";
 static const char* fShader = "shaders/fragment.glsl";
-static const char* tcs = "shaders/tri_tcs.glsl";
-static const char* tes = "shaders/tri_tes.glsl";
-static const char* tv = "shaders/tri_vert.glsl";
+static const char* ptcs = "shaders/tri_tcs.glsl";
+static const char* ptes = "shaders/tri_tes.glsl";
+static const char* ptv = "shaders/tri_vert.glsl";
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
@@ -123,16 +127,16 @@ void CreateObjects() {
 void CreateShaders() {
 	
 
-	Shader* shader1 = new Shader();
+	/*Shader* shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(shader1);
+	shaderList.push_back(shader1);*/
 
 	/*Shader* shader2 = new Shader();
 	shader2->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(shader2);*/
 
 	Shader* shader3 = new Shader();
-	shader3->CreateFromFiles(tv, tcs, tes, fShader);
+	shader3->CreateFromFiles(vShader, tcs, tes, fShader);
 	shaderList.push_back(shader3);
 
 	directionalShadowShader = Shader();
@@ -165,41 +169,47 @@ void RenderScene() {
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[2]->RenderMesh();
 
-	//model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
-	//model = glm::rotate(model, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
 	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//xwing.RenderModel();
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	boat.RenderModel();
 
+	glUseProgram(0);
+}
 
-	///*model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(-7.5f, 0.0f, 8.0f));
-	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));*/
+void RenderSceneTess() {
+	glm::mat4 model(1.0f);
 
-	//glm::vec3 cameraPosition = camera.getCameraPosition();
-	//float cameraYaw = camera.GetYaw(); // Assuming the Camera class has getYaw() function
-	//glm::vec3 cameraFront = camera.getCameraDirection();
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	brickTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[0]->RenderMeshPatches();
 
-	//// Adjust the position and orientation of the mech
-	//model = glm::mat4(1.0f);
-	//model = glm::translate(model, cameraPosition - cameraFront * -4.f); // Adjust the offset
-	//model = glm::translate(model, glm::vec3(0.f, -0.5f, 0.f));
-	////model = glm::rotate(model, glm::radians(cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotate the model to face the camera's direction
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	dirtTexture.UseTexture();
+	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[1]->RenderMeshPatches();
 
-	//// Calculate the rotation to make the model face the camera's direction
-	//glm::vec3 modelForward = glm::vec3(0.0f, 0.0f, 1.0f); // Assuming the model's forward direction is +Z
-	//glm::vec3 targetDirection = glm::normalize(cameraFront);
-	//glm::quat rotation = glm::quatLookAt(targetDirection, glm::vec3(0.f, 1.f, 0.f));
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[2]->RenderMeshPatches();
 
-	//model = model * glm::mat4(rotation);
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
+	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	boat.RenderModelPatches();
 
-
-	//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//mech.RenderModel();
+	glUseProgram(0);
 }
 
 void OmniShadowMapPass(PointLight* light) {
@@ -250,7 +260,12 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+
 	shaderList[0]->UseShader();
+
+	if(f)
+		std::cout << "shader id in render" << shaderList[0]->GetShaderID() << std::endl, f = false;
 
 	uniformModel = shaderList[0]->GetModelLocation();
 	uniformProjection = shaderList[0]->GetProjectionLocation();
@@ -265,7 +280,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	glUniform1f(uniformTessellationLevel, 1.f);
+	glUniform1f(uniformTessellationLevel, 5.f);
 
 	shaderList[0]->SetDirectionalLight(&mainLight);
 	shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
@@ -283,7 +298,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	shaderList[0]->Validate();
 
-	RenderScene();
+	RenderSceneTess();
 }
 
 
@@ -306,10 +321,10 @@ int main() {
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	/*xwing = Model();
-	xwing.LoadModel("models/x-wing.obj");
+	boat = Model();
+	boat.LoadModel("models/boat.obj");
 
-	mech = Model();
+	/*mech = Model();
 	mech.LoadModel("models/Kaiser.obj");*/
 
 	mainLight = DirectionalLight(

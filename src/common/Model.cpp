@@ -19,6 +19,19 @@ void Model::RenderModel()
 	}
 }
 
+void Model::RenderModelPatches()
+{
+	for (size_t i = 0; i < meshList.size(); i++) {
+		unsigned int materialIndex = meshToTexture[i];
+
+		if (materialIndex < textureList.size() && textureList[materialIndex]) {
+			textureList[materialIndex]->UseTexture();
+		}
+
+		meshList[i]->RenderMeshPatches();
+	}
+}
+
 void Model::LoadModel(const std::string& fileName)
 {
 	Assimp::Importer importer;

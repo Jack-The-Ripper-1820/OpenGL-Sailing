@@ -346,6 +346,9 @@ void Shader::CompileShader(const char* vertexCode, const char* tessControlCode, 
 	std::cout << "fs worked" << std::endl;
 
 	CompileProgram();
+
+	std::cout << "shaderID: " << shaderID << std::endl;
+
 }
 
 void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
