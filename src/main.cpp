@@ -127,13 +127,13 @@ void CreateShaders() {
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(shader1);
 
-	Shader* shader2 = new Shader();
+	/*Shader* shader2 = new Shader();
 	shader2->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(shader2);
+	shaderList.push_back(shader2);*/
 
-	/*Shader* shader3 = new Shader();
+	Shader* shader3 = new Shader();
 	shader3->CreateFromFiles(tv, tcs, tes, fShader);
-	shaderList.push_back(*shader3);*/
+	shaderList.push_back(shader3);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
