@@ -84,6 +84,7 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 			vertices.insert(vertices.end(), { 0.0f, 0.0f });
 		}
 		
+		//std::cout << " " << - mesh->mNormals[i].x << " " << -mesh->mNormals[i].y << " " << -mesh->mNormals[i].z << std::endl;
 		vertices.insert(vertices.end(), { -mesh->mNormals[i].x, -mesh->mNormals[i].y, -mesh->mNormals[i].z });
 
 	}

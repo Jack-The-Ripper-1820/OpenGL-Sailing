@@ -59,16 +59,16 @@ in vec4 vCol[];
 in vec2 TexCoord[];
 in vec3 Normal[];
 in vec3 FragPos[];
-in vec4 DirectionalLightSpacePos[];
+//in vec4 DirectionalLightSpacePos[];
 
 //in vec4 DirectionalLightSpacePos[];
 
 out patch OutputPatch oPatch;
-out patch vec4 pDirectionalLightSpacePos;
+//out patch vec4 pDirectionalLightSpacePos;
 out patch vec4 pCol;
 
 void main() {
-    pDirectionalLightSpacePos = DirectionalLightSpacePos[gl_InvocationID];
+    //pDirectionalLightSpacePos = DirectionalLightSpacePos[gl_InvocationID];
     pCol = vCol[gl_InvocationID];
 
     /*for (int i = 0; i < 3; i++) {

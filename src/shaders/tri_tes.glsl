@@ -52,14 +52,14 @@ struct OutputPatch
 layout(triangles, equal_spacing, ccw) in;
 
 in patch OutputPatch oPatch;
-in patch vec4 pDirectionalLightSpacePos;
+//in patch vec4 pDirectionalLightSpacePos;
 in patch vec4 pCol;
 
 out vec4 vCol;
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
-out vec4 DirectionalLightSpacePos;
+//out vec4 DirectionalLightSpacePos;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -73,12 +73,13 @@ vec4 interpolate3D(vec4 v0, vec4 v1, vec4 v2)
 
 
 void main() {
-    DirectionalLightSpacePos = pDirectionalLightSpacePos;
+    //DirectionalLightSpacePos = pDirectionalLightSpacePos;
     vCol = pCol;
 
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
+
 
     float u3 = pow(u, 3);
     float v3 = pow(v, 3);
@@ -105,15 +106,12 @@ void main() {
         oPatch.C111 * 6.0 * w * u * v;*/
 
     FragPos = (model * vec4(pos, 1.0)).xyz;
+
     TexCoord = tex;
-   // Normal = norm;
-    //vCol = col;
-    //FragPos = pos;
 
     Normal = mat3(transpose(inverse(model))) * norm;
 
-    //FragPos = (model * vec4(pos, 1.0)).xyz;
-
     gl_Position = projection* view* model* vec4(pos, 1.0);
-    DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
+
+    //DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
 }

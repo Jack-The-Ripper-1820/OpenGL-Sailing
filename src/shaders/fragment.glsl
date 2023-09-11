@@ -4,9 +4,11 @@ in vec4 vCol;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
-in vec4 DirectionalLightSpacePos;
+//in vec4 DirectionalLightSpacePos;
 
 out vec4 color;
+
+vec4 DirectionalLightSpacePos; 
 
 const int MAX_POINT_LIGHTS = 3;
 const int MAX_SPOT_LIGHTS = 3;
@@ -68,6 +70,10 @@ uniform sampler2D directionalShadowMap;
 uniform Material material;
 
 uniform vec3 eyePosition;
+
+uniform mat4 directionalLightTransform;
+
+uniform mat4 model;
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -219,9 +225,11 @@ vec4 CalcSpotLights()
 
 void main()
 {
+	DirectionalLightSpacePos = directionalLightTransform * model * vec4(FragPos, 1.0);
+
 	vec4 finalColor = CalcDirectionalLight(DirectionalLightSpacePos);
 	finalColor += CalcPointLights();
 	finalColor += CalcSpotLights();
 	
-	color = texture(theTexture, TexCoord) * finalColor;
+	color = texture(theTexture, TexCoord) * vCol * finalColor;
 }

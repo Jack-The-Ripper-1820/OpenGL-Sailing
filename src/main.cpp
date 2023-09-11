@@ -68,9 +68,11 @@ static const char* vShader = "shaders/vertex.glsl";
 static const char* tcs = "shaders/tcs.glsl";
 static const char* tes = "shaders/tes.glsl";
 static const char* fShader = "shaders/fragment.glsl";
-static const char* ptcs = "shaders/tri_tcs.glsl";
-static const char* ptes = "shaders/tri_tes.glsl";
-static const char* ptv = "shaders/tri_vert.glsl";
+static const char* pTtcs = "shaders/tri_tcs.glsl";
+static const char* pTtes = "shaders/tri_tes.glsl";
+static const char* ptv = "shaders/tess_vert.glsl";
+static const char* pQtcs = "shaders/quad_tcs.glsl";
+static const char* pQtes = "shaders/quad_tes.glsl";
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
@@ -83,6 +85,39 @@ uniformDirectionalLightTransform = 0,
 uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0;
 
 void CreateObjects() {
+	GLfloat boatVertices[] = {
+		// Base (Triangle 1)
+		0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+
+		// Left Side (Triangle 2)
+		0.0f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, -1.0f, 0.0f, 0.0f,
+		-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+
+		// Right Side (Triangle 3)
+		0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+		// Back (Triangle 4)
+		-0.5f, 0.0f, -0.5f, 0.5f, 0.5f, 0.5f, 0.0f, 0.5f, -1.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, -0.5f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, -1.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f,
+	};
+
+	unsigned int boatIndices[] = {
+		0, 1, 2, // Triangle 1 (Base)
+		3, 4, 5, // Triangle 2 (Left Side)
+		6, 7, 8, // Triangle 3 (Right Side)
+		9, 10, 11, // Triangle 4 (Back)
+	};
+
+
+
+
+
 	unsigned int indices[] = {
 		0, 3, 1,
 		1, 3, 2,
@@ -103,7 +138,7 @@ void CreateObjects() {
 		1, 2, 3
 	};
 
-	GLfloat floorVerices[] = {
+	GLfloat floorVertices[] = {
 		-10.0f, 0.0f, -10.0f,	1,1,1,    0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
 		10.0f, 0.0f, -10.0f,	1,1,1,    10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
 		-10.0f, 0.0f, 10.0f,	1,1,1,    0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
@@ -112,6 +147,7 @@ void CreateObjects() {
 
 
 	Utils::calcAverageNormal(indices, 12, vertices, 44, 11, 8);
+	Utils::calcAverageNormal(boatIndices, 12, boatVertices, 11 * 12, 11, 8);
 
 	Mesh* obj1 = new Mesh();
 	obj1->CreateMesh(vertices, indices, 44, 12);
@@ -120,27 +156,29 @@ void CreateObjects() {
 	obj2->CreateMesh(vertices, indices, 44, 12);
 
 	Mesh* obj3 = new Mesh();
-	obj3->CreateMesh(floorVerices, floorIndices, 44, 6);
+	obj3->CreateMesh(floorVertices, floorIndices, 44, 6);
+
+	Mesh* obj4 = new Mesh();
+	obj4->CreateMesh(boatVertices, boatIndices, 11 * 12, 12);
+
+
 
 	meshList.push_back(obj1);
 	meshList.push_back(obj2);
 	meshList.push_back(obj3);
+	meshList.push_back(obj4);
 }
 
 void CreateShaders() {
 	
 
-	/*Shader* shader1 = new Shader();
-	shader1->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(shader1);*/
+	Shader* shaderPNT = new Shader();
+	shaderPNT->CreateFromFiles(ptv, pTtcs, pTtes, fShader);
+	shaderList.push_back(shaderPNT);
 
-	/*Shader* shader2 = new Shader();
-	shader2->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(shader2);*/
-
-	Shader* shader3 = new Shader();
-	shader3->CreateFromFiles(ptv, ptcs, ptes, fShader);
-	shaderList.push_back(shader3);
+	Shader* shaderPNQ = new Shader();
+	shaderPNQ->CreateFromFiles(ptv, pQtcs, pQtes, fShader);
+	shaderList.push_back(shaderPNQ);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
@@ -179,6 +217,13 @@ void RenderScene() {
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	boat.RenderModel();
 
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMesh();
+
 	glUseProgram(0);
 }
 
@@ -212,6 +257,13 @@ void RenderSceneTess() {
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	boat.RenderModelPatches(bWireFrame);
 
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMeshPatches();
+
 	glUseProgram(0);
 }
 
@@ -232,7 +284,7 @@ void OmniShadowMapPass(PointLight* light) {
 	omniShadowShader.SetOmniLightMatrices(light->CalcLightTransform());
 
 	omniShadowShader.Validate();
-	RenderScene();
+	RenderSceneTess();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -250,7 +302,7 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	directionalShadowShader.SetDirectionalLightTransform(&lightTransform);
 
 	directionalShadowShader.Validate();
-	RenderScene();
+	RenderSceneTess();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -418,7 +470,7 @@ int main() {
 		}
 
 		if (mainWindow.getKeys()[GLFW_KEY_UP]) {
-			tessLevel = std::min(tessLevel + 1, 8.f);
+			tessLevel = std::min(tessLevel + 1, 16.f);
 			mainWindow.getKeys()[GLFW_KEY_UP] = false;
 		}
 
