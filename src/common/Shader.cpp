@@ -52,6 +52,13 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* tessControl
 	CompileShader(vertexCode, tessControlCode, tessEvalCode, fragmentCode);
 }
 
+void Shader::CreateFromFiles(const char* computeLocation)
+{
+	std::string computeString = ReadFile(computeLocation);
+	const char* computeCode = computeString.c_str();
+	CompileShader(computeCode);
+}
+
 void Shader::Validate()
 {
 	GLint result = 0;
@@ -299,11 +306,17 @@ void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {
 		return;
 	}
 
-	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	GLuint vShader = AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
 	std::cout << "shader" << std::endl;
-	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+	GLuint fShader = AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
 	std::cout << "frag" << std::endl;
 	CompileProgram();
+
+	glDetachShader(shaderID, vShader);
+	glDetachShader(shaderID, fShader);
+
+	glDeleteShader(vShader);
+	glDeleteShader(fShader);
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode)
@@ -316,11 +329,19 @@ void Shader::CompileShader(const char* vertexCode, const char* geometryCode, con
 		return;
 	}
 
-	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
-	AddShader(shaderID, geometryCode, GL_GEOMETRY_SHADER);
-	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+	GLuint vShader = AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	GLuint  gShader = AddShader(shaderID, geometryCode, GL_GEOMETRY_SHADER);
+	GLuint fShader = AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
 
 	CompileProgram();
+
+	glDetachShader(shaderID, vShader);
+	glDetachShader(shaderID, gShader);
+	glDetachShader(shaderID, fShader);
+
+	glDeleteShader(vShader);
+	glDeleteShader(gShader);
+	glDeleteShader(fShader);
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* tessControlCode, const char* tessEvalCode, const char* fragmentCode)
@@ -333,25 +354,55 @@ void Shader::CompileShader(const char* vertexCode, const char* tessControlCode, 
 		return;
 	}
 
-	AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	GLuint vShader = AddShader(shaderID, vertexCode, GL_VERTEX_SHADER);
 	std::cout << "vs worked" << std::endl;
 
-	AddShader(shaderID, tessControlCode, GL_TESS_CONTROL_SHADER);
+	GLuint tcShader = AddShader(shaderID, tessControlCode, GL_TESS_CONTROL_SHADER);
 	std::cout << "tcs worked" << std::endl;
 
-	AddShader(shaderID, tessEvalCode, GL_TESS_EVALUATION_SHADER);
+	GLuint teShader = AddShader(shaderID, tessEvalCode, GL_TESS_EVALUATION_SHADER);
 	std::cout << "tes worked" << std::endl;
 
-	AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+	GLuint fShader = AddShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
 	std::cout << "fs worked" << std::endl;
 
 	CompileProgram();
 
 	std::cout << "shaderID: " << shaderID << std::endl;
 
+	glDetachShader(shaderID, vShader);
+	glDetachShader(shaderID, tcShader);
+	glDetachShader(shaderID, teShader);
+	glDetachShader(shaderID, fShader);
+	
+	glDeleteShader(vShader);
+	glDeleteShader(tcShader);
+	glDeleteShader(teShader);
+	glDeleteShader(fShader);
+
 }
 
-void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
+void Shader::CompileShader(const char* computeCode)
+{
+	shaderID = glCreateProgram();
+
+	if (!shaderID) {
+		printf("Error creating shader program!\n");
+		return;
+	}
+
+	GLuint shader = AddShader(shaderID, computeCode, GL_COMPUTE_SHADER);
+	std::cout << "CS worked" << std::endl;
+
+	CompileProgram();
+
+	glDetachShader(shaderID, shader);
+	glDeleteShader(shader);
+
+	std::cout << "shaderID: " << shaderID << std::endl;
+}
+
+GLuint Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
 	GLuint theShader = glCreateShader(shaderType);
 
 	const GLchar* theCode[1];
@@ -372,10 +423,12 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 		glGetShaderInfoLog(theShader, 1024, NULL, eLog);
 		fprintf(stderr, "Error compiling the %d shader: '%s'\n", shaderType, eLog);
 		std::exit(0);
-		return;
+		return -1;
 	}
 
 	glAttachShader(theProgram, theShader);
+
+	return theShader;
 }
 
 void Shader::UseShader() {

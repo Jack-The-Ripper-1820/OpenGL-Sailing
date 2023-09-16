@@ -22,7 +22,8 @@ public:
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation);
-
+	void CreateFromFiles(const char* computeLocation);
+	void RunComputeShader(GLfloat* inputData, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 
 	void Validate();
 
@@ -111,5 +112,6 @@ private:
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
 	void CompileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
 	void CompileShader(const char* vertexCode, const char* tessControlCode, const char* tessEvalCode, const char* fragmentCode);
-	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
+	void CompileShader(const char* computeCode);
+	GLuint AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 };

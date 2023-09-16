@@ -40,6 +40,8 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 }
 
 
+
+
 void Mesh::RenderMesh(bool bWireFrame) {
 	bWireFrame ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(VAO);
