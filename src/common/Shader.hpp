@@ -23,7 +23,7 @@ public:
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* computeLocation);
-	void RunComputeShader(GLfloat* inputData, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
+	//void RunComputeShader(GLfloat* inputData, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 
 	void Validate();
 
@@ -42,6 +42,7 @@ public:
 	GLuint GetFarPlaneLocation();
 	GLuint GetTesslationLevelLocation();
 	GLuint GetShaderID();
+	GLuint GetTime();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -51,6 +52,7 @@ public:
 	void SetDirectionalLightTransform(glm::mat4* lightTransform);
 	void SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTessellationLevel(float level);
+	void SetTime(float time);
 
 	void UseShader();
 	void ClearShader();
@@ -60,7 +62,7 @@ public:
 private:
 	int pointLightCount, spotLightCount;
 
-	GLuint shaderID, uniformProjection, uniformModel, uniformView, 
+	GLuint shaderID, uniformProjection, uniformModel, uniformView,
 		uniformEyePosition, uniformSpecularIntensity, uniformShininess,
 		uniformPointLightCount,
 		uniformSpotLightCount,
@@ -69,7 +71,8 @@ private:
 		uniformTexture,
 		uniformOmniLightPos,
 		uniformFarPlane,
-		uniformTessellationLevel;
+		uniformTessellationLevel,
+		uniformTime;
 
 	GLuint uniformLightMatrices[6];
 

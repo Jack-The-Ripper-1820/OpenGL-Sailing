@@ -91,6 +91,35 @@ void Mesh::ClearMesh() {
 	indexCount = 0;
 }
 
+void Mesh::CreateMeshFromControlPoints(GLfloat* controlpoints, unsigned int numcontrolpoints)
+{
+	glGenBuffers(1, &controlpointVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, controlpointVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(controlpoints[0]) * numcontrolpoints * 2, NULL, GL_DYNAMIC_DRAW);
+
+	glGenVertexArrays(1, &controlpointVAO);
+	glBindVertexArray(controlpointVAO);
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, controlpointVBO);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(controlpoints[0]) * 4, (const void*)0);
+	}
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::ConvertPointsToPatches(GLfloat* controlpoints)
+{
+	/*int numpoints = sizeof(controlpoints) / sizeof(controlpoints[0]);
+	int numverts = numpoints * 2;
+
+	glBindBuffer(GL_ARRAY_BUFFER, controlpointVBO);*/
+
+}
+
 Mesh::~Mesh() {
 	ClearMesh();
 }

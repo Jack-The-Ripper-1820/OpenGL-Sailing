@@ -158,6 +158,11 @@ GLuint Shader::GetShaderID()
 	return shaderID;
 }
 
+GLuint Shader::GetTime()
+{
+	return uniformTime;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -224,6 +229,11 @@ void Shader::SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices)
 void Shader::SetTessellationLevel(float level)
 {
 	glUniform1f(uniformTessellationLevel, level);
+}
+
+void Shader::SetTime(float time)
+{
+	glUniform1f(uniformTime, time);
 }
 
 void Shader::CompileProgram()
@@ -295,7 +305,9 @@ void Shader::CompileProgram()
 		uniformOmniShadowMap[i].uniformFarPlane = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].farPlane", i).c_str());
 	}
 
-	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");	
+	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
+	uniformTime = glGetUniformLocation(shaderID, "time");
+
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {

@@ -78,6 +78,7 @@ static const char* nurbsTcs = "shaders/nurbs_tcs.glsl";
 static const char* nurbsTes = "shaders/nurbs_tes.glsl";
 static const char* colVS = "shaders/color_vertex.glsl";
 static const char* colFS = "shaders/color_fragment.glsl";
+static const char* waterVert = "shaders/water_vert.glsl";
 
 float scalex = 1, scaley = 1;
 
@@ -89,19 +90,20 @@ bool bWireFrame = false;
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0,
 uniformDirectionalLightTransform = 0,
-uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0;
+uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0,
+uniformTime = 0;
 
 void CreateObjects() {
-	GLfloat controlpoints[][4] = {
-	{ 200, 100, 0, 0 },
-	{ 222, 407, 0, 0 },
-	{ 315, 587, 0, 0 },
-	{ 684, 304, 0, 0 },
+	GLfloat controlpoints[] = {
+	200, 100, 0, 0,
+	222, 407, 0, 0,
+	315, 587, 0, 0,
+	684, 304, 0, 0,
 
-	{ 963, 387, 0, 0 },
-	{ 1090, 615, 0, 0 },
-	{ 671, 688, 0, 0 },
-	{ 710, 507, 0, 0 }
+	963, 387, 0, 0,
+	1090, 615, 0, 0,
+	671, 688, 0, 0,
+	710, 507, 0, 0
 	};
 
 
@@ -175,7 +177,32 @@ void CreateObjects() {
 		4.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 3.0f, 3.0f, 0.0f, -1.0f, 0.0f
 	};
 
+
+	/*GLuint oceanIndices[] = {
+	0, 4, 5
+	};*/
 	GLuint oceanIndices[] = {
+	0, 1, 5,
+	0, 5, 4,
+	1, 2, 6,
+	1, 6, 5,
+	2, 3, 7,
+	2, 7, 6,
+	4, 5, 9,
+	4, 9, 8,
+	5, 6, 10,
+	5, 10, 9,
+	6, 7, 11,
+	6, 11, 10,
+	8, 9, 13,
+	8, 13, 12,
+	9, 10, 14,
+	9, 14, 13,
+	10, 11, 15,
+	10, 15, 14
+	};
+
+	/*GLuint oceanIndices[] = {
 		0, 1, 4,
 		1, 2, 5,
 		2, 3, 6,
@@ -185,7 +212,48 @@ void CreateObjects() {
 		8, 9, 12,
 		9, 10, 13,
 		10, 11, 14,
-	};
+	};*/
+
+	//GLuint oceanIndices[] = {
+	//0, 1, 4,
+	//1, 2, 4, 
+	//2, 3, 4, // Triangles for the first sub-grid
+
+	//4, 5, 8,
+	//5, 6, 8, 
+	//6, 7, 8, // Triangles for the second sub-grid
+
+	//8, 9, 12,
+	//9, 10, 12, 
+	//10, 11, 12, // Triangles for the third sub-grid
+
+	//13, 12, 9,
+	//13, 9, 8, 
+	//13, 8, 4, // Triangles for the fourth sub-grid
+	//};
+
+	/*GLuint oceanIndices[] = {
+	0, 1, 5,
+	0, 5, 4,
+	1, 2, 6,
+	1, 6, 5,
+	2, 3, 7,
+	2, 7, 6,
+	4, 5, 9,
+	4, 9, 8,
+	5, 6, 10,
+	5, 10, 9,
+	6, 7, 11,
+	6, 11, 10,
+	8, 9, 13,
+	8, 13, 12,
+	9, 10, 14,
+	9, 14, 13
+	};*/
+
+	
+
+
 
 	unsigned int floorIndices[] = {
 		0, 2, 1,
@@ -218,7 +286,7 @@ void CreateObjects() {
 
 	Utils::calcAverageNormal(indices, 12, vertices, 44, 11, 8);
 	Utils::calcAverageNormal(boatIndices, 12, boatVertices, 11 * 12, 11, 8);
-	Utils::calcAverageNormal(oceanIndices, 9 * 3, oceanVertices, 11 * 16, 11, 8);
+	Utils::calcAverageNormal(oceanIndices, 18 * 3, oceanVertices, 11 * 16, 11, 8);
 
 
 	Mesh* obj1 = new Mesh();
@@ -234,7 +302,7 @@ void CreateObjects() {
 	obj4->CreateMesh(boatVertices, boatIndices, 11 * 12, 12);
 
 	Mesh* obj5 = new Mesh();
-	obj5->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 9 * 3);
+	obj5->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
 
 	Mesh* obj6 = new Mesh();
 	obj6->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
@@ -267,6 +335,10 @@ void CreateShaders() {
 	Shader* axisShader = new Shader();
 	axisShader->CreateFromFiles(colVS, colFS);
 	shaderList.push_back(axisShader);
+
+	Shader* waterShader = new Shader();
+	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, fShader);
+	shaderList.push_back(waterShader);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
@@ -486,6 +558,47 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	glUseProgram(0);
 
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+
+	shaderList[4]->UseShader();
+
+	uniformModel = shaderList[4]->GetModelLocation();
+	uniformProjection = shaderList[4]->GetProjectionLocation();
+	uniformView = shaderList[4]->GetViewLocation();
+	uniformEyePosition = shaderList[4]->GetEyePositionLocation();
+	uniformSpecularIntensity = shaderList[4]->GetSpecularIntensityLocation();
+	uniformShininess = shaderList[4]->GetShininessLocation();
+	uniformTessellationLevel = shaderList[4]->GetTesslationLevelLocation();
+	uniformTime = shaderList[4]->GetTime();
+
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+	
+
+	shaderList[4]->SetTime(glfwGetTime());
+
+	shaderList[4]->SetTessellationLevel(tessLevel);
+
+	shaderList[4]->SetDirectionalLight(&mainLight);
+	shaderList[4]->SetPointLights(pointLights, pointLightCount, 3, 0);
+	shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	lightTansform = mainLight.CalcLightTransform();
+	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
+
+	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+	shaderList[4]->SetTexture(1);
+	shaderList[4]->SetDirectionalShadowMap(2);
+
+	lowerLight = camera.getCameraPosition();
+	lowerLight.y -= 0.3f;
+	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+
+	shaderList[4]->Validate();
+
+	RenderOceanTess();
+
+	glUseProgram(0);
 
 	//// ocean
 	//glPatchParameteri(GL_PATCH_VERTICES, 16);
