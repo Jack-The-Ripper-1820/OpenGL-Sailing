@@ -14,6 +14,7 @@ public:
 	void ClearMesh();
 	void CreateMeshFromControlPoints(GLfloat* controlpoints, unsigned int numcontrolpoints);
 	void ConvertPointsToPatches(GLfloat* controlpoints);
+	void CreateWaterMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 
 	~Mesh();
 

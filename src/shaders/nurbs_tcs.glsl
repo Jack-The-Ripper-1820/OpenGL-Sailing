@@ -24,9 +24,18 @@ void main()
 	tc_Normal[gl_InvocationID] = Normal[gl_InvocationID];
 	tc_FragPos[gl_InvocationID] = FragPos[gl_InvocationID];
 
+	/*for (int i = 0; i < 16; i++) {
+		tc_FragPos[i] = FragPos[i];
+		tc_vCol[i] = vCol[i];
+		tc_TexCoord[i] = TexCoord[i];
+		tc_Normal[i] = Normal[i];
+	}*/
+
+	gl_TessLevelInner[0] = TessellationLevel; // Adjust these tessellation levels as needed
+	gl_TessLevelInner[1] = TessellationLevel;
 	gl_TessLevelOuter[0] = TessellationLevel;
 	gl_TessLevelOuter[1] = TessellationLevel;
 	gl_TessLevelOuter[2] = TessellationLevel;
-	gl_TessLevelInner[0] = TessellationLevel;
+	gl_TessLevelOuter[3] = TessellationLevel;
 }
 
