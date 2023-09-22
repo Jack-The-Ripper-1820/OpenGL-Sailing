@@ -2,6 +2,7 @@
 
 #include <GL\glew.h>
 #include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <stdio.h>
 #include <vector>
 
@@ -23,6 +24,8 @@ public:
 
 	~Mesh();
 
+	glm::mat4 model;
+
 private:
 	GLuint VAO, VBO, IBO;
 	GLsizei indexCount;
@@ -34,6 +37,4 @@ private:
 	float maxX = numeric_limits<float>::min(); 
 	float maxY = numeric_limits<float>::min();  
 	float maxZ = numeric_limits<float>::min();
-
-
 };

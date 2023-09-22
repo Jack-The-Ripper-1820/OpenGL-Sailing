@@ -1,4 +1,6 @@
-﻿#define STB_IMAGE_IMPLEMENTATION
+﻿#ifndef STB_IMAGE_IMPLEMENTATION
+	#define STB_IMAGE_IMPLEMENTATION
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -381,28 +383,28 @@ void CreateShaders() {
 void RenderScene() {
 	glm::mat4 model(1.0f);
 
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMesh();
+	meshList[0]->RenderMesh();*/
 
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMesh();
+	meshList[1]->RenderMesh();*/
 
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMesh();
+	meshList[2]->RenderMesh();*/
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
+	model = glm::translate(model, glm::vec3(-7.0f, 1.0f, 10.0f));
 	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -410,18 +412,18 @@ void RenderScene() {
 
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(7.0f, 0.0f, 10.0f));
+	model = glm::translate(model, glm::vec3(7.0f, 1.0f, 10.0f));
 	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	boat2.RenderModel();
 
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMesh();
+	meshList[3]->RenderMesh();*/
 
 	glUseProgram(0);
 }
@@ -468,7 +470,7 @@ void RenderSceneTess() {
 
 	glm::mat4 model(1.0f);
 
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -479,10 +481,10 @@ void RenderSceneTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMeshPatches(bWireFrame);
+	meshList[1]->RenderMeshPatches(bWireFrame);*/
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, boat1Z));
+	model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat1Z));
 	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -494,7 +496,7 @@ void RenderSceneTess() {
 	}
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, boat2Z));
+	model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat2Z));
 	model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
 	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -509,18 +511,18 @@ void RenderSceneTess() {
 	firstRender = true;
 
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMeshPatches(bWireFrame);
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//plainTexture.UseTexture();
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//meshList[3]->RenderMeshPatches(bWireFrame);
 
-	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//meshList[4]->RenderMeshPatches(bWireFrame);
+	//model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//plainTexture.UseTexture();
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	////meshList[4]->RenderMeshPatches(bWireFrame);
 
 	glUseProgram(0);
 }
@@ -537,7 +539,7 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
+	model = glm::scale(model, glm::vec3(5.f, 1.f, 5.f));
 	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
@@ -667,7 +669,6 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	
-
 	shaderList[4]->SetTime(glfwGetTime());
 
 	shaderList[4]->SetTessellationLevel(16);

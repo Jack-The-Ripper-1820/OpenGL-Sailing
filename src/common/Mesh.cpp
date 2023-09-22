@@ -1,6 +1,6 @@
 #include <Mesh.hpp>
 
-Mesh::Mesh() {
+Mesh::Mesh() : model(1.f) {
 	VAO = 0;
 	VBO = 0;
 	IBO = 0;

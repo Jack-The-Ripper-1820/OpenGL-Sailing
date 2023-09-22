@@ -1,6 +1,6 @@
 #include <Model.hpp>
 
-Model::Model()
+Model::Model() : model(1.f)
 {
 	model = glm::mat4(1.f);
 	position = glm::vec3(0.f, 0.f, 0.f);

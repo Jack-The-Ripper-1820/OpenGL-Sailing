@@ -26,6 +26,8 @@ public:
 	void SetModelMatrix(glm::mat4 const& matrix) { model = matrix; }
 	~Model();
 
+	glm::mat4 model;
+
 	float minX = numeric_limits<float>::max();
 	float minY = numeric_limits<float>::max();
 	float minZ = numeric_limits<float>::max();
@@ -55,6 +57,5 @@ private:
 	std::vector<unsigned int> meshToTexture;
 	glm::vec3 position;
 	glm::vec4 scale;
-	glm::mat4 model;
 };
 
