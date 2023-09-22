@@ -8,6 +8,17 @@ Mesh::Mesh() {
 }
 
 void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices) {
+	for (unsigned int i = 0; i < numOfVertices; i += 11) {
+		minX = min(minX, vertices[i]);
+		maxX = max(maxX, vertices[i]);
+
+		minY = min(minY, vertices[i + 1]);
+		maxY = max(maxY, vertices[i + 1]);
+
+		minZ = min(minZ, vertices[i + 2]);
+		maxZ = max(maxZ, vertices[i + 2]);
+	}
+	
 	indexCount = numOfIndices;
 
 	glGenVertexArrays(1, &VAO);
@@ -70,6 +81,11 @@ void Mesh::CreateWaterMesh(GLfloat* vertices, unsigned int* indices, unsigned in
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+}
+
+pair<glm::vec3, glm::vec3> Mesh::GetBoundaries()
+{
+	return { glm::vec3(minX, minY, minZ), glm::vec3(maxX, maxY, maxZ) };
 }
 
 

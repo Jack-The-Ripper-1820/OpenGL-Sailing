@@ -1,7 +1,11 @@
 #pragma once
 
 #include <GL\glew.h>
+#include <glm\glm.hpp>
 #include <stdio.h>
+#include <vector>
+
+using namespace std;
 
 class Mesh {
 public:
@@ -15,6 +19,7 @@ public:
 	void CreateMeshFromControlPoints(GLfloat* controlpoints, unsigned int numcontrolpoints);
 	void ConvertPointsToPatches(GLfloat* controlpoints);
 	void CreateWaterMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
+	pair<glm::vec3, glm::vec3> GetBoundaries();
 
 	~Mesh();
 
@@ -23,6 +28,12 @@ private:
 	GLsizei indexCount;
 	GLuint controlpointVBO;
 	GLuint controlpointVAO;
+	float minX = numeric_limits<float>::max();
+	float minY = numeric_limits<float>::max();
+	float minZ = numeric_limits<float>::max();
+	float maxX = numeric_limits<float>::min(); 
+	float maxY = numeric_limits<float>::min();  
+	float maxZ = numeric_limits<float>::min();
 
 
 };

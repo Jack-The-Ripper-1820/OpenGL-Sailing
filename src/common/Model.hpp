@@ -26,6 +26,25 @@ public:
 	void SetModelMatrix(glm::mat4 const& matrix) { model = matrix; }
 	~Model();
 
+	float minX = numeric_limits<float>::max();
+	float minY = numeric_limits<float>::max();
+	float minZ = numeric_limits<float>::max();
+	float maxX = numeric_limits<float>::min();
+	float maxY = numeric_limits<float>::min();
+	float maxZ = numeric_limits<float>::min();
+
+	float GetWidth() {
+		return abs(maxZ - minZ) + 0.2f;
+	}
+
+	float GetHeight() {
+		return abs(maxY - minY) + 0.2f;
+	}
+
+	float GetLength() {
+		return abs(maxX - minX) + 0.2f;
+	}
+
 private:
 	void LoadNode(aiNode* node, const aiScene* scene);
 	void LoadMesh(aiMesh* mesh, const aiScene* scene);

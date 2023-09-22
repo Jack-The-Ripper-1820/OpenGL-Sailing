@@ -100,6 +100,14 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 	Mesh* newMesh = new Mesh();
 	newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size());
 	meshList.push_back(newMesh);
+	auto boundaries = newMesh->GetBoundaries();
+	minX = min(minX, boundaries.first.r);
+	minY = min(minY, boundaries.first.g);
+	minZ = min(minZ, boundaries.first.b);
+	maxX = max(maxX, boundaries.second.r);
+	maxY = max(maxY, boundaries.second.g);
+	maxZ = max(maxZ, boundaries.second.b);
+
 	meshToTexture.push_back(mesh->mMaterialIndex);
 }
 

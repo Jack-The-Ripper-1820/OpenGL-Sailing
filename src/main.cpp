@@ -38,7 +38,7 @@ Camera camera;
 
 Material glossyMaterial, matteMaterial;
 
-Model boat;
+Model boat1, boat2;
 
 Texture brickTexture;
 Texture dirtTexture;
@@ -395,7 +395,7 @@ void RenderScene() {
 	meshList[1]->RenderMesh();
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -406,7 +406,15 @@ void RenderScene() {
 	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat.RenderModel();
+	boat1.RenderModel();
+
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(7.0f, 0.0f, 10.0f));
+	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	boat2.RenderModel();
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -418,7 +426,46 @@ void RenderScene() {
 	glUseProgram(0);
 }
 
+float boat1Z = 10.f, boat2Z = -10.f;
+float speed = 0.1f;
+bool firstRender = false;
+
 void RenderSceneTess() {
+	if (firstRender) {
+		if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
+			boat1Z -= speed * deltaTime;
+			boat1.minZ += speed * deltaTime;
+			boat1.maxZ += speed * deltaTime;
+		}
+
+		if ((boat2Z + boat2.GetWidth()) + speed * deltaTime < boat1Z) {
+			boat2Z += speed * deltaTime;
+			boat2.minZ -= speed * deltaTime;
+			boat2.maxZ -= speed * deltaTime;
+		}
+	}
+	
+	
+	else {
+		boat1Z -= speed * deltaTime;
+		boat2Z += speed * deltaTime;
+	}
+
+	//cout << "boat1: " << boat1.maxZ << " " << boat1.minZ << std::endl;
+	//cout << "boat2: " << boat2.maxZ << " " << boat2.minZ << std::endl;
+
+	/*if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
+		boat1Z -= speed * deltaTime;
+		boat1.minZ -= speed * deltaTime;
+		boat1.maxZ -= speed * deltaTime;
+	}
+
+	if ((boat2Z + boat2.GetWidth()) + speed * deltaTime < boat1Z) {
+		boat2Z += speed * deltaTime;
+		boat2.minZ += speed * deltaTime;
+		boat2.maxZ += speed * deltaTime;
+	}*/
+
 	glm::mat4 model(1.0f);
 
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
@@ -434,19 +481,33 @@ void RenderSceneTess() {
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[1]->RenderMeshPatches(bWireFrame);
 
-	/*model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, boat1Z));
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMeshPatches(bWireFrame);*/
+	boat1.RenderModelPatches(bWireFrame);
+
+	if (firstRender == false) {
+		boat1.minZ = model[2][0] * boat1.minZ + model[2][1] * boat1.minZ + model[2][2] * boat1.minZ + model[2][3];
+		boat1.maxZ = model[2][0] * boat1.maxZ + model[2][1] * boat1.maxZ + model[2][2] * boat1.maxZ + model[2][3];
+	}
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
-	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, boat2Z));
+	model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat.RenderModelPatches(bWireFrame);
+	boat2.RenderModelPatches(bWireFrame);
+
+	if (firstRender == false) {
+		boat2.minZ = model[2][0] * boat2.minZ + model[2][1] * boat2.minZ + model[2][2] * boat2.minZ + model[2][3];
+		boat2.maxZ = model[2][0] * boat2.maxZ + model[2][1] * boat2.maxZ + model[2][2] * boat2.maxZ + model[2][3];
+	}
+
+	firstRender = true;
+
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -455,7 +516,7 @@ void RenderSceneTess() {
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[3]->RenderMeshPatches(bWireFrame);
 
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -476,19 +537,12 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
+	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[4]->RenderMeshPatches(bWireFrame);
-
-	//model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
-	////model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//boat.RenderModelPatches(bWireFrame);
-
 }
 
 void OmniShadowMapPass(PointLight* light) {
@@ -702,8 +756,11 @@ int main() {
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	boat = Model();
-	boat.LoadModel("models/boat.obj");
+	boat1 = Model();
+	boat1.LoadModel("models/boat.obj");
+
+	boat2 = Model();
+	boat2.LoadModel("models/boat.obj");
 
 	/*mech = Model();
 	mech.LoadModel("models/Kaiser.obj");*/
