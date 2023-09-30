@@ -163,6 +163,11 @@ GLuint Shader::GetTime()
 	return uniformTime;
 }
 
+GLuint Shader::GetClipPlaneLocation()
+{
+	return uniformClipPlane;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -171,7 +176,7 @@ void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 
 void Shader::SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset)
 {
-	if (lightCount > N_POINT_LIGHTS) lightCount = N_POINT_LIGHTS;
+	if (lightCount > MAX_POINT_LIGHTS) lightCount = MAX_POINT_LIGHTS;
 
 	glUniform1i(uniformPointLightCount, lightCount);
 
@@ -188,7 +193,7 @@ void Shader::SetPointLights(PointLight* pointLight, unsigned int lightCount, uns
 
 void Shader::SetSpotLights(SpotLight* spotLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset)
 {
-	if (lightCount > N_SPOT_LIGHTS) lightCount = N_SPOT_LIGHTS;
+	if (lightCount > MAX_SPOT_LIGHTS) lightCount = MAX_SPOT_LIGHTS;
 
 	glUniform1i(uniformSpotLightCount, lightCount);
 
@@ -236,6 +241,11 @@ void Shader::SetTime(float time)
 	glUniform1f(uniformTime, time);
 }
 
+void Shader::SetClipPlane(glm::vec4 &&clipPlane)
+{
+	glUniform4f(uniformClipPlane, clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w);
+}
+
 void Shader::CompileProgram()
 {
 	GLint result = 0;
@@ -265,7 +275,7 @@ void Shader::CompileProgram()
 
 	uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
 
-	for (size_t i = 0; i < N_POINT_LIGHTS; i++) {
+	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++) {
 		uniformPointLight[i].uniformColor = glGetUniformLocation(shaderID, std::format("pointLights[{}].base.color", i).c_str());
 		uniformPointLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderID, std::format("pointLights[{}].base.ambientIntensity", i).c_str());
 		uniformPointLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderID, std::format("pointLights[{}].base.diffuseIntensity", i).c_str());
@@ -277,7 +287,7 @@ void Shader::CompileProgram()
 
 	uniformSpotLightCount = glGetUniformLocation(shaderID, "spotLightCount");
 
-	for (size_t i = 0; i < N_SPOT_LIGHTS; i++) {
+	for (size_t i = 0; i < MAX_SPOT_LIGHTS; i++) {
 		uniformSpotLight[i].uniformColor = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.color", i).c_str());
 		uniformSpotLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.ambientIntensity", i).c_str());
 		uniformSpotLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.diffuseIntensity", i).c_str());
@@ -300,14 +310,14 @@ void Shader::CompileProgram()
 		uniformLightMatrices[i] = glGetUniformLocation(shaderID, std::format("lightMatrices[{}]", i).c_str());
 	}
 
-	for (size_t i = 0; i < N_POINT_LIGHTS + N_SPOT_LIGHTS; i++) {
+	for (size_t i = 0; i < MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS; i++) {
 		uniformOmniShadowMap[i].uniformShadowMap = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].shadowMap", i).c_str());
 		uniformOmniShadowMap[i].uniformFarPlane = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].farPlane", i).c_str());
 	}
 
 	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
 	uniformTime = glGetUniformLocation(shaderID, "time");
-
+	uniformClipPlane = glGetUniformLocation(shaderID, "clipPlane");
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {

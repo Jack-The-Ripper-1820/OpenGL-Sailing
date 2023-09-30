@@ -20,10 +20,26 @@ private:
 	GLuint refractionTexture;
 	GLuint refractionDepthTexture; 
 
+	void InitReflectionFrameBuffer();
+	void InitRefractionFrameBuffer();
 
 public:
 	WaterFrameBuffers();
+	~WaterFrameBuffers();
 
+	void BindReflectionFrameBuffer();
+	void BindRefractionFrameBuffer();
 
+	void UnbindCurrentFrameBuffer();
 
+	GLuint GetReflectionTexture() { return reflectionTexture; }
+	GLuint GetRefractionTexture() { return refractionTexture; }
+
+	void BindFrameBuffer(GLuint frameBuffer, int width, int height);
+
+	GLuint CreateFrameBuffer();
+
+	GLuint CreateTextureAttachment(int width, int height);
+	GLuint CreateDepthTextureAttachment(int width, int height);
+	GLuint CreateDepthBufferAttachment(int width, int height);
 };

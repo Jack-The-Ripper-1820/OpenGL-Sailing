@@ -24,6 +24,7 @@
 #include <Constants.hpp>
 #include <Model.hpp>
 #include <Skybox.hpp>
+#include <WaterFrameBuffers.hpp>
 
 bool f = true;
 
@@ -48,8 +49,8 @@ Texture plainTexture;
 Texture oceanTexture;
 
 DirectionalLight mainLight;
-PointLight pointLights[N_POINT_LIGHTS];
-SpotLight spotLights[N_SPOT_LIGHTS];
+PointLight pointLights[MAX_POINT_LIGHTS];
+SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
@@ -589,15 +590,15 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
-	glViewport(0, 0, 1366, 768);
+void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 &&clipPlane) {
+	glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
-	////axes
+	//axes
 	shaderList[3]->UseShader();
 
 	uniformModel = shaderList[3]->GetModelLocation();
@@ -646,12 +647,18 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	lowerLight.y -= 0.3f;
 	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
+	shaderList[0]->SetClipPlane(std::move(clipPlane));
+
 	shaderList[0]->Validate();
 
 	RenderSceneTess();
 
-	glUseProgram(0);
 
+	glUseProgram(0);
+}
+
+
+void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	shaderList[4]->UseShader();
@@ -668,7 +675,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	
+
 	shaderList[4]->SetTime(glfwGetTime());
 
 	shaderList[4]->SetTessellationLevel(16);
@@ -676,14 +683,14 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	shaderList[4]->SetDirectionalLight(&mainLight);
 	shaderList[4]->SetPointLights(pointLights, pointLightCount, 3, 0);
 	shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
-	lightTansform = mainLight.CalcLightTransform();
+	auto lightTansform = mainLight.CalcLightTransform();
 	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
 	shaderList[4]->SetTexture(1);
 	shaderList[4]->SetDirectionalShadowMap(2);
 
-	lowerLight = camera.getCameraPosition();
+	auto lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
 	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
@@ -692,52 +699,10 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	RenderOceanTess();
 
 	glUseProgram(0);
-
-	//// ocean
-	//glPatchParameteri(GL_PATCH_VERTICES, 16);
-
-	//shaderList[2]->UseShader();
-
-	//uniformModel = shaderList[2]->GetModelLocation();
-	//uniformProjection = shaderList[2]->GetProjectionLocation();
-	//uniformView = shaderList[2]->GetViewLocation();
-	//uniformEyePosition = shaderList[2]->GetEyePositionLocation();
-	//uniformSpecularIntensity = shaderList[2]->GetSpecularIntensityLocation();
-	//uniformShininess = shaderList[2]->GetShininessLocation();
-	//uniformTessellationLevel = shaderList[2]->GetTesslationLevelLocation();
-
-
-	//glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	//glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	//glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
-	//shaderList[2]->SetTessellationLevel(tessLevel);
-
-	//shaderList[2]->SetDirectionalLight(&mainLight);
-	////shaderList[2]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	////shaderList[2]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
-	//auto lightTansform = mainLight.CalcLightTransform();
-	//shaderList[2]->SetDirectionalLightTransform(&lightTansform);
-
-	//mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	//shaderList[2]->SetTexture(1);
-	//shaderList[2]->SetDirectionalShadowMap(2);
-
-	//auto lowerLight = camera.getCameraPosition();
-	//lowerLight.y -= 0.3f;
-	////spotLights[2].SetFlash(lowerLight, camera.getCameraDirection());
-
-	//shaderList[2]->Validate();
-
-	//RenderOceanTess();
-
-	//glUseProgram(0);
-
 }
 
-
 int main() {
-	mainWindow = Window(1360, 768); // 1280, 1024 or 1024, 768
+	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); // 1280, 1024 or 1024, 768
 	mainWindow.Initialize();
 
 	CreateObjects();
@@ -762,9 +727,6 @@ int main() {
 
 	boat2 = Model();
 	boat2.LoadModel("models/boat.obj");
-
-	/*mech = Model();
-	mech.LoadModel("models/Kaiser.obj");*/
 
 	mainLight = DirectionalLight(
 		0.678f, 0.847f, 0.902f,
@@ -838,6 +800,8 @@ int main() {
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
+	WaterFrameBuffers waterFBO = WaterFrameBuffers();
+
 	// Loop until window closed
 	while (!mainWindow.getShouldClose()) {
 		GLfloat now = glfwGetTime();
@@ -846,6 +810,7 @@ int main() {
 
 		// Get + Handle User Input
 		glfwPollEvents();
+
 
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
@@ -870,7 +835,7 @@ int main() {
 			mainWindow.getKeys()[GLFW_KEY_B] = false;
 		}
 
-
+		glEnable(GL_CLIP_DISTANCE0);
 
 		DirectionalShadowMapPass(&mainLight);
 
@@ -882,7 +847,17 @@ int main() {
 			OmniShadowMapPass(&spotLights[i]);
 		}
 
-		RenderPass(camera.calculateViewMatrix(), projection);
+		waterFBO.BindReflectionFrameBuffer();
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, 1, 0, 0 });
+		waterFBO.UnbindCurrentFrameBuffer();
+
+
+		waterFBO.BindRefractionFrameBuffer();
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 0 });
+		waterFBO.UnbindCurrentFrameBuffer();
+
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
+		OceanRenderPass(camera.calculateViewMatrix(), projection);
 
 		glUseProgram(0);
 

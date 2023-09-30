@@ -43,6 +43,7 @@ public:
 	GLuint GetTesslationLevelLocation();
 	GLuint GetShaderID();
 	GLuint GetTime();
+	GLuint GetClipPlaneLocation();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -53,6 +54,7 @@ public:
 	void SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTessellationLevel(float level);
 	void SetTime(float time);
+	void SetClipPlane(glm::vec4 &&clipPlane);
 
 	void UseShader();
 	void ClearShader();
@@ -72,7 +74,8 @@ private:
 		uniformOmniLightPos,
 		uniformFarPlane,
 		uniformTessellationLevel,
-		uniformTime;
+		uniformTime,
+		uniformClipPlane;
 
 	GLuint uniformLightMatrices[6];
 
@@ -91,7 +94,7 @@ private:
 		GLuint uniformConstant;
 		GLuint uniformLinear;
 		GLuint uniformExponent;
-	} uniformPointLight[N_POINT_LIGHTS];
+	} uniformPointLight[MAX_POINT_LIGHTS];
 
 	struct {
 		GLuint uniformColor;
@@ -104,12 +107,12 @@ private:
 
 		GLuint uniformDirection;
 		GLuint uniformEdgeAngle;
-	} uniformSpotLight[N_SPOT_LIGHTS];
+	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	struct {
 		GLuint uniformShadowMap;
 		GLuint uniformFarPlane;
-	} uniformOmniShadowMap[N_POINT_LIGHTS + N_SPOT_LIGHTS];
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 
 	void CompileProgram();
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
