@@ -26,7 +26,7 @@ bool ShadowMap::Init(unsigned int width, unsigned int height)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
 
-	glDrawBuffer(GL_NONE);
+	glDrawBuffer(GL_NONE); // dont do anything with the color
 	glReadBuffer(GL_NONE);
 
 	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

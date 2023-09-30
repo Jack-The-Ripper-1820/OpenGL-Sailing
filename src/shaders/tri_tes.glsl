@@ -65,6 +65,7 @@ uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 directionalLightTransform;
+uniform vec4 clipPlane;
 
 vec4 interpolate3D(vec4 v0, vec4 v1, vec4 v2)
 {
@@ -110,6 +111,8 @@ void main() {
     TexCoord = tex;
 
     Normal = mat3(transpose(inverse(model))) * norm;
+
+    gl_ClipDistance[0] = dot(vec4(pos, 1.0), clipPlane);
 
     gl_Position = projection* view* model* vec4(pos, 1.0);
 

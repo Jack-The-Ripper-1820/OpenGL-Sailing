@@ -22,7 +22,8 @@ public:
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation);
-
+	void CreateFromFiles(const char* computeLocation);
+	//void RunComputeShader(GLfloat* inputData, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 
 	void Validate();
 
@@ -41,6 +42,8 @@ public:
 	GLuint GetFarPlaneLocation();
 	GLuint GetTesslationLevelLocation();
 	GLuint GetShaderID();
+	GLuint GetTime();
+	GLuint GetClipPlaneLocation();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -50,6 +53,8 @@ public:
 	void SetDirectionalLightTransform(glm::mat4* lightTransform);
 	void SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTessellationLevel(float level);
+	void SetTime(float time);
+	void SetClipPlane(glm::vec4 &&clipPlane);
 
 	void UseShader();
 	void ClearShader();
@@ -59,7 +64,7 @@ public:
 private:
 	int pointLightCount, spotLightCount;
 
-	GLuint shaderID, uniformProjection, uniformModel, uniformView, 
+	GLuint shaderID, uniformProjection, uniformModel, uniformView,
 		uniformEyePosition, uniformSpecularIntensity, uniformShininess,
 		uniformPointLightCount,
 		uniformSpotLightCount,
@@ -68,7 +73,9 @@ private:
 		uniformTexture,
 		uniformOmniLightPos,
 		uniformFarPlane,
-		uniformTessellationLevel;
+		uniformTessellationLevel,
+		uniformTime,
+		uniformClipPlane;
 
 	GLuint uniformLightMatrices[6];
 
@@ -87,7 +94,7 @@ private:
 		GLuint uniformConstant;
 		GLuint uniformLinear;
 		GLuint uniformExponent;
-	} uniformPointLight[N_POINT_LIGHTS];
+	} uniformPointLight[MAX_POINT_LIGHTS];
 
 	struct {
 		GLuint uniformColor;
@@ -100,16 +107,17 @@ private:
 
 		GLuint uniformDirection;
 		GLuint uniformEdgeAngle;
-	} uniformSpotLight[N_SPOT_LIGHTS];
+	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	struct {
 		GLuint uniformShadowMap;
 		GLuint uniformFarPlane;
-	} uniformOmniShadowMap[N_POINT_LIGHTS + N_SPOT_LIGHTS];
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 
 	void CompileProgram();
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
 	void CompileShader(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
 	void CompileShader(const char* vertexCode, const char* tessControlCode, const char* tessEvalCode, const char* fragmentCode);
-	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
+	void CompileShader(const char* computeCode);
+	GLuint AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 };
