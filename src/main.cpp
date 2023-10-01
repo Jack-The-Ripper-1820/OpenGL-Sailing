@@ -68,6 +68,8 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
+float moveFactor = 0;
+
 static const char* vShader = "shaders/vertex.glsl";
 static const char* tcs = "shaders/tcs.glsl";
 static const char* tes = "shaders/tes.glsl";
@@ -461,7 +463,7 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(5.f, 1.f, 5.f));
+	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
 	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
@@ -606,6 +608,11 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFram
 	shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
 	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
+	
+	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
+	moveFactor = fmod(moveFactor, 1.0);
+
+	shaderList[4]->SetMoveFactor(moveFactor);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
 	//waterFBO.ReadTextures();
@@ -655,7 +662,7 @@ int main() {
 	boat2.LoadModel("models/boat.obj");
 
 	mainLight = DirectionalLight(
-		0.678f, 0.847f, 0.902f,
+		0.5f, 0.5f, 1.0f,
 		0.1f, 0.9f,
 		-10.0f, -12.0f, -18.5f,
 		2048, 2048);
@@ -717,7 +724,7 @@ int main() {
 
 	skyBox = Skybox(skyBoxFaces);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 
 	WaterFrameBuffers waterFBO = WaterFrameBuffers();
 

@@ -77,6 +77,8 @@ uniform mat4 directionalLightTransform;
 
 uniform mat4 model;
 
+uniform float moveFactor;
+
 
 const float waveStrength = 0.02;
 
@@ -240,17 +242,19 @@ void main()
 	vec4 reflectColor = texture(reflectionTexture, TexCoord);
 	vec4 refractColor = texture(refractionTexture, TexCoord);
 
-	vec2 distortion = (texture(theTexture, vec2(TexCoord.x, TexCoord.y)).rg * 2.0 - 1.0) * waveStrength;
+	vec2 distortion1 = (texture(theTexture, vec2(TexCoord.x + moveFactor, TexCoord.y)).rg * 2.0 - 1.0) * waveStrength;
+	vec2 distortion2 = (texture(theTexture, vec2(-TexCoord.x + moveFactor, TexCoord.y + moveFactor)).rg * 2.0 - 1.0) * waveStrength;
+	vec2 totalDistortion = distortion1 + distortion2;
 
 	vec4 texColor = texture(theTexture, TexCoord);
 
-	vec2 newTexCoord = TexCoord + distortion;
+	vec2 newTexCoord = TexCoord + totalDistortion;
 	newTexCoord.x = clamp(newTexCoord.x, 0.001, 0.999);
 	newTexCoord.y = clamp(newTexCoord.y, 0.001, 0.999);
 
 	vec4 newTexColor = texture(theTexture, newTexCoord);
 
-	color = newTexColor * vCol * finalColor;
+	color = newTexColor * finalColor;
 	//color = mix(reflectColor, refractColor, 0.5) * finalColor;
 
 }

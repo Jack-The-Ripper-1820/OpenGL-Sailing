@@ -515,9 +515,9 @@ vec3 GerstnerWave(vec3 position, float time) {
     for (int i = 0; i < NUM_WAVES; i++) {
         float waveFactor = D[i].x * position.x + D[i].y * position.z - S[i] * time;
 
-        displaceX += (gl_VertexID % 4 == 0) ? Q * A[i] * sin(waveFactor) : Q * A[i] * cos(waveFactor);
+        displaceX += 0;// (gl_VertexID % 4 == 0) ? Q * A[i] * sin(waveFactor) : Q * A[i] * cos(waveFactor);
         displaceY += (gl_VertexID % 2 == 0) ? A[i] * cos(waveFactor) : 0;
-        displaceZ += (gl_VertexID % 2 == 1) ? Q * A[i] * sin(waveFactor) : 0;
+        displaceZ += 0;// (gl_VertexID % 2 == 1) ? Q * A[i] * sin(waveFactor) : 0;
     }
 
     return vec3(position.x + displaceX, position.y + displaceY, position.z + displaceZ);

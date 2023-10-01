@@ -168,6 +168,11 @@ GLuint Shader::GetClipPlaneLocation()
 	return uniformClipPlane;
 }
 
+GLuint Shader::GetMoveFactorLocation()
+{
+	return uniformMoveFactor;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -256,6 +261,11 @@ void Shader::SetRefractionTexture(GLuint textureUnit)
 	glUniform1i(uniformRefractionTexture, textureUnit);
 }
 
+void Shader::SetMoveFactor(float moveFactor)
+{
+	glUniform1f(uniformMoveFactor, moveFactor);
+}
+
 void Shader::CompileProgram()
 {
 	GLint result = 0;
@@ -331,6 +341,7 @@ void Shader::CompileProgram()
 
 	uniformReflectionTexture = glGetUniformLocation(shaderID, "reflectionTexture");
 	uniformRefractionTexture = glGetUniformLocation(shaderID, "refractionTexture");
+	uniformMoveFactor = glGetUniformLocation(shaderID, "moveFactor");
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {

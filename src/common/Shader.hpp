@@ -44,6 +44,7 @@ public:
 	GLuint GetShaderID();
 	GLuint GetTime();
 	GLuint GetClipPlaneLocation();
+	GLuint GetMoveFactorLocation();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -57,6 +58,7 @@ public:
 	void SetClipPlane(glm::vec4 &&clipPlane);
 	void SetReflectionTexture(GLuint textureUnit);
 	void SetRefractionTexture(GLuint textureUnit);
+	void SetMoveFactor(float moveFactor);
 
 	void UseShader();
 	void ClearShader();
@@ -79,7 +81,8 @@ private:
 		uniformTime,
 		uniformClipPlane,
 		uniformReflectionTexture,
-		uniformRefractionTexture;
+		uniformRefractionTexture,
+		uniformMoveFactor;
 
 	GLuint uniformLightMatrices[6];
 
