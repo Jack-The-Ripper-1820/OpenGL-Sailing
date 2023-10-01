@@ -55,6 +55,8 @@ public:
 	void SetTessellationLevel(float level);
 	void SetTime(float time);
 	void SetClipPlane(glm::vec4 &&clipPlane);
+	void SetReflectionTexture(GLuint textureUnit);
+	void SetRefractionTexture(GLuint textureUnit);
 
 	void UseShader();
 	void ClearShader();
@@ -75,7 +77,9 @@ private:
 		uniformFarPlane,
 		uniformTessellationLevel,
 		uniformTime,
-		uniformClipPlane;
+		uniformClipPlane,
+		uniformReflectionTexture,
+		uniformRefractionTexture;
 
 	GLuint uniformLightMatrices[6];
 

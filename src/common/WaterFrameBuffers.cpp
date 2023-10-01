@@ -34,6 +34,15 @@ WaterFrameBuffers::~WaterFrameBuffers()
 	std::cout << "Water Frame Buffer destroyed" << std::endl;
 }
 
+void WaterFrameBuffers::ReadTextures()
+{
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, GetReflectionTexture());
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, GetRefractionTexture());
+}
+
 void WaterFrameBuffers::BindReflectionFrameBuffer()
 {
 	BindFrameBuffer(reflectionFrameBuffer, REFLECTION_WIDTH, REFLECTION_HEIGHT);
@@ -46,14 +55,14 @@ void WaterFrameBuffers::BindRefractionFrameBuffer()
 
 void WaterFrameBuffers::UnbindCurrentFrameBuffer()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 }
 
 void WaterFrameBuffers::BindFrameBuffer(GLuint frameBuffer, int width, int height)
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer);
 	glViewport(0, 0, width, height);
 }
 
@@ -73,7 +82,7 @@ GLuint WaterFrameBuffers::CreateTextureAttachment(int width, int height)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
+	glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
 	return texture;
 }
 

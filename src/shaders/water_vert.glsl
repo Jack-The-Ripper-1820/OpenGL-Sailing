@@ -505,6 +505,8 @@ vec2(0.8, 0.1), vec2(0.4, -0.3), vec2(0.2, 1.0), vec2(-0.3, 0.4) , vec2(7.0, -4.
 const float S[NUM_WAVES] = { 1.0, 1.2, 1.4, 1.6, 1.75, 1.74, 1.18, 1.3, 0.4, 1.8 }; // Speeds
 const float Q = 0.1;  // Steepness
 
+const float tiling = 6.0f;
+
 vec3 GerstnerWave(vec3 position, float time) {
     float displaceX = 0.0;
     float displaceY = 0.0;
@@ -553,7 +555,7 @@ void main() {
     FragPos = vec3(model * vec4(displacedPos, 1.0));
     //gl_Position = projection * view * vec4(FragPos, 1.0);
     vCol = vec4(clamp(col, 0.0, 1.0), 1.0);
-    TexCoord = tex;
+    TexCoord = tex;// *tiling;
     Normal = norm; // ComputeGerstnerNormal(pos, time);
 }
 

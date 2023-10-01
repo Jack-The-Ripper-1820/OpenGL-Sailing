@@ -82,6 +82,7 @@ static const char* nurbsTes = "shaders/nurbs_tes.glsl";
 static const char* colVS = "shaders/color_vertex.glsl";
 static const char* colFS = "shaders/color_fragment.glsl";
 static const char* waterVert = "shaders/water_vert.glsl";
+static const char* waterFrag = "shaders/water_frag.glsl";
 
 float scalex = 1, scaley = 1;
 
@@ -156,30 +157,6 @@ void CreateObjects() {
 			0.0f, 1.0f, 0.0f,      1,1,1,     0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
 	};
 
-
-	//GLfloat oceanVertices[] = {
-	//	//  x    y    z    r    g    b    u    v    nx    ny   nz
-	//	1.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 2.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 3.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 2.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 3.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 1.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 3.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 0.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 1.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 2.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 3.0f, 3.0f, 0.0f, -1.0f, 0.0f
-	//};
-
 	GLfloat oceanVertices[] = {
 		//  x    y    z    r    g    b        u    v         nx    ny   nz
 		1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
@@ -204,9 +181,6 @@ void CreateObjects() {
 	};
 
 
-	/*GLuint oceanIndices[] = {
-	0, 4, 5
-	};*/
 	GLuint oceanIndices[] = {
 	0, 1, 5,
 	0, 5, 4,
@@ -227,59 +201,6 @@ void CreateObjects() {
 	10, 11, 15,
 	10, 15, 14
 	};
-
-	/*GLuint oceanIndices[] = {
-		0, 1, 4,
-		1, 2, 5,
-		2, 3, 6,
-		4, 5, 8,
-		5, 6, 9,
-		6, 7, 10,
-		8, 9, 12,
-		9, 10, 13,
-		10, 11, 14,
-	};*/
-
-	//GLuint oceanIndices[] = {
-	//0, 1, 4,
-	//1, 2, 4, 
-	//2, 3, 4, // Triangles for the first sub-grid
-
-	//4, 5, 8,
-	//5, 6, 8, 
-	//6, 7, 8, // Triangles for the second sub-grid
-
-	//8, 9, 12,
-	//9, 10, 12, 
-	//10, 11, 12, // Triangles for the third sub-grid
-
-	//13, 12, 9,
-	//13, 9, 8, 
-	//13, 8, 4, // Triangles for the fourth sub-grid
-	//};
-
-	/*GLuint oceanIndices[] = {
-	0, 1, 5,
-	0, 5, 4,
-	1, 2, 6,
-	1, 6, 5,
-	2, 3, 7,
-	2, 7, 6,
-	4, 5, 9,
-	4, 9, 8,
-	5, 6, 10,
-	5, 10, 9,
-	6, 7, 11,
-	6, 11, 10,
-	8, 9, 13,
-	8, 13, 12,
-	9, 10, 14,
-	9, 14, 13
-	};*/
-
-	
-
-
 
 	unsigned int floorIndices[] = {
 		0, 2, 1,
@@ -363,7 +284,7 @@ void CreateShaders() {
 	shaderList.push_back(axisShader);
 
 	Shader* waterShader = new Shader();
-	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, fShader);
+	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, waterFrag);
 	shaderList.push_back(waterShader);
 
 	/*Shader* waterShader = new Shader();
@@ -658,7 +579,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 &&cl
 }
 
 
-void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFrameBuffers &waterFBO) {
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	shaderList[4]->UseShader();
@@ -687,8 +608,13 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+	//waterFBO.ReadTextures();
+
 	shaderList[4]->SetTexture(1);
 	shaderList[4]->SetDirectionalShadowMap(2);
+
+	//shaderList[4]->SetReflectionTexture(3);
+	//shaderList[4]->SetRefractionTexture(4);
 
 	auto lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
@@ -780,13 +706,6 @@ int main() {
 
 	std::vector<std::string> skyBoxFaces;
 
-	/*skyBoxFaces.push_back("textures/lightblue/right.tga");
-	skyBoxFaces.push_back("textures/lightblue/left.tga");
-	skyBoxFaces.push_back("textures/lightblue/top.tga");
-	skyBoxFaces.push_back("textures/lightblue/bot.tga");
-	skyBoxFaces.push_back("textures/lightblue/back.tga");
-	skyBoxFaces.push_back("textures/lightblue/front.tga");*/
-
 
 	skyBoxFaces.push_back("textures/clouds/right.bmp");
 	skyBoxFaces.push_back("textures/clouds/left.bmp");
@@ -835,7 +754,6 @@ int main() {
 			mainWindow.getKeys()[GLFW_KEY_B] = false;
 		}
 
-		glEnable(GL_CLIP_DISTANCE0);
 
 		DirectionalShadowMapPass(&mainLight);
 
@@ -847,17 +765,32 @@ int main() {
 			OmniShadowMapPass(&spotLights[i]);
 		}
 
+		/*glEnable(GL_CLIP_DISTANCE0);
+
 		waterFBO.BindReflectionFrameBuffer();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, 1, 0, 0 });
+		
+		glm::vec3 cameraPos = camera.getCameraPosition();
+		float distance = 2 * cameraPos.y - 15;
+		cameraPos.y -= distance;
+		camera.setCameraPosition(cameraPos);
+		camera.invertPitch();
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
+		
 		waterFBO.UnbindCurrentFrameBuffer();
 
+		cameraPos.y += distance;
+		camera.setCameraPosition(cameraPos);
+		camera.invertPitch();
 
 		waterFBO.BindRefractionFrameBuffer();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 0 });
-		waterFBO.UnbindCurrentFrameBuffer();
-
 		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
-		OceanRenderPass(camera.calculateViewMatrix(), projection);
+		waterFBO.UnbindCurrentFrameBuffer();*/
+
+
+		glDisable(GL_CLIP_DISTANCE0);
+
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 10000 });
+		OceanRenderPass(camera.calculateViewMatrix(), projection, waterFBO);
 
 		glUseProgram(0);
 
