@@ -33,6 +33,7 @@ std::vector<Mesh*> meshList;
 std::vector<Shader*> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
+Shader oceanComputeShader;
 
 Skybox skyBox;
 
@@ -85,6 +86,7 @@ static const char* colVS = "shaders/color_vertex.glsl";
 static const char* colFS = "shaders/color_fragment.glsl";
 static const char* waterVert = "shaders/water_vert.glsl";
 static const char* waterFrag = "shaders/water_frag.glsl";
+static const char* oceanComp = "shaders/ocean_comp.glsl";
 
 float scalex = 1, scaley = 1;
 
@@ -267,8 +269,6 @@ void CreateObjects() {
 }
 
 void CreateShaders() {
-	
-
 	Shader* shaderPNT = new Shader();
 	shaderPNT->CreateFromFiles(ptv, pTtcs, pTtes, fShader);
 	shaderList.push_back(shaderPNT);
@@ -289,13 +289,8 @@ void CreateShaders() {
 	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, waterFrag);
 	shaderList.push_back(waterShader);
 
-	/*Shader* waterShader = new Shader();
-	waterShader->CreateFromFiles(waterVert, nurbsTcs, nurbsTes, fShader);
-	shaderList.push_back(waterShader);*/
-
-	/*Shader* axisShader1 = new Shader();
-	axisShader1->CreateFromFiles(colVS, colFS);*/
-	//shaderList.push_back(shaderPNQ);
+	oceanComputeShader = Shader();
+	oceanComputeShader.CreateFromFiles(oceanComp);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
@@ -377,30 +372,15 @@ void RenderSceneTess() {
 		boat2Z += speed * deltaTime;
 	}
 
-	//cout << "boat1: " << boat1.maxZ << " " << boat1.minZ << std::endl;
-	//cout << "boat2: " << boat2.maxZ << " " << boat2.minZ << std::endl;
-
-	/*if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
-		boat1Z -= speed * deltaTime;
-		boat1.minZ -= speed * deltaTime;
-		boat1.maxZ -= speed * deltaTime;
-	}
-
-	if ((boat2Z + boat2.GetWidth()) + speed * deltaTime < boat1Z) {
-		boat2Z += speed * deltaTime;
-		boat2.minZ += speed * deltaTime;
-		boat2.maxZ += speed * deltaTime;
-	}*/
-
 	glm::mat4 model(1.0f);
 
 	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMeshPatches(bWireFrame);
+	meshList[0]->RenderMeshPatches(bWireFrame);*/
 
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
@@ -435,18 +415,18 @@ void RenderSceneTess() {
 	firstRender = true;
 
 
-	//model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//plainTexture.UseTexture();
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//meshList[3]->RenderMeshPatches(bWireFrame);
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMeshPatches(bWireFrame);
 
-	//model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//plainTexture.UseTexture();
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	////meshList[4]->RenderMeshPatches(bWireFrame);
+	/*model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[4]->RenderMeshPatches(bWireFrame);*/
 
 	glUseProgram(0);
 }
@@ -634,6 +614,10 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFram
 	glUseProgram(0);
 }
 
+void UpdateOceanVerts() {
+	
+}
+
 int main() {
 	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); // 1280, 1024 or 1024, 768
 	mainWindow.Initialize();
@@ -641,7 +625,7 @@ int main() {
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(-3.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
 	brickTexture = Texture("textures/brick.png");
 	brickTexture.LoadTextureA();
@@ -661,8 +645,12 @@ int main() {
 	boat2 = Model();
 	boat2.LoadModel("models/boat.obj");
 
+	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
+		glm::clamp(206.f, 0.f, 1.f),
+		glm::clamp(255.f, 0.f, 1.f));
+
 	mainLight = DirectionalLight(
-		0.5f, 0.5f, 1.0f,
+		skyblue.r, skyblue.g, skyblue.b,
 		0.1f, 0.9f,
 		-10.0f, -12.0f, -18.5f,
 		2048, 2048);
@@ -761,7 +749,6 @@ int main() {
 			mainWindow.getKeys()[GLFW_KEY_B] = false;
 		}
 
-
 		DirectionalShadowMapPass(&mainLight);
 
 		for (size_t i = 0; i < pointLightCount; i++) {
@@ -771,6 +758,8 @@ int main() {
 		for (size_t i = 0; i < spotLightCount; i++) {
 			OmniShadowMapPass(&spotLights[i]);
 		}
+
+		UpdateOceanVerts();
 
 		/*glEnable(GL_CLIP_DISTANCE0);
 

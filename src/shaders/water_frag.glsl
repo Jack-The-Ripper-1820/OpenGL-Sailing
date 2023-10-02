@@ -254,7 +254,7 @@ void main()
 
 	vec4 newTexColor = texture(theTexture, newTexCoord);
 
-	color = newTexColor * finalColor;
+	color = newTexColor * vCol * finalColor;
 	//color = mix(reflectColor, refractColor, 0.5) * finalColor;
 
 }
