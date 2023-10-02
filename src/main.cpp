@@ -33,6 +33,7 @@ std::vector<Mesh*> meshList;
 std::vector<Shader*> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
+Shader oceanComputeShader;
 
 Skybox skyBox;
 
@@ -68,6 +69,8 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
+float moveFactor = 0;
+
 static const char* vShader = "shaders/vertex.glsl";
 static const char* tcs = "shaders/tcs.glsl";
 static const char* tes = "shaders/tes.glsl";
@@ -82,6 +85,8 @@ static const char* nurbsTes = "shaders/nurbs_tes.glsl";
 static const char* colVS = "shaders/color_vertex.glsl";
 static const char* colFS = "shaders/color_fragment.glsl";
 static const char* waterVert = "shaders/water_vert.glsl";
+static const char* waterFrag = "shaders/water_frag.glsl";
+static const char* oceanComp = "shaders/ocean_comp.glsl";
 
 float scalex = 1, scaley = 1;
 
@@ -156,30 +161,6 @@ void CreateObjects() {
 			0.0f, 1.0f, 0.0f,      1,1,1,     0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
 	};
 
-
-	//GLfloat oceanVertices[] = {
-	//	//  x    y    z    r    g    b    u    v    nx    ny   nz
-	//	1.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 2.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 3.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 2.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 2.0f,  0.0f, 0.0f, 1.0f, 3.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 1.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 2.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 3.0f,  0.0f, 0.0f, 1.0f, 3.0f, 2.0f, 0.0f, -1.0f, 0.0f,
-
-	//	1.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 0.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	2.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 1.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	3.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 2.0f, 3.0f, 0.0f, -1.0f, 0.0f,
-	//	4.0f, 0.0f, 4.0f,  0.0f, 0.0f, 1.0f, 3.0f, 3.0f, 0.0f, -1.0f, 0.0f
-	//};
-
 	GLfloat oceanVertices[] = {
 		//  x    y    z    r    g    b        u    v         nx    ny   nz
 		1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
@@ -204,9 +185,6 @@ void CreateObjects() {
 	};
 
 
-	/*GLuint oceanIndices[] = {
-	0, 4, 5
-	};*/
 	GLuint oceanIndices[] = {
 	0, 1, 5,
 	0, 5, 4,
@@ -227,59 +205,6 @@ void CreateObjects() {
 	10, 11, 15,
 	10, 15, 14
 	};
-
-	/*GLuint oceanIndices[] = {
-		0, 1, 4,
-		1, 2, 5,
-		2, 3, 6,
-		4, 5, 8,
-		5, 6, 9,
-		6, 7, 10,
-		8, 9, 12,
-		9, 10, 13,
-		10, 11, 14,
-	};*/
-
-	//GLuint oceanIndices[] = {
-	//0, 1, 4,
-	//1, 2, 4, 
-	//2, 3, 4, // Triangles for the first sub-grid
-
-	//4, 5, 8,
-	//5, 6, 8, 
-	//6, 7, 8, // Triangles for the second sub-grid
-
-	//8, 9, 12,
-	//9, 10, 12, 
-	//10, 11, 12, // Triangles for the third sub-grid
-
-	//13, 12, 9,
-	//13, 9, 8, 
-	//13, 8, 4, // Triangles for the fourth sub-grid
-	//};
-
-	/*GLuint oceanIndices[] = {
-	0, 1, 5,
-	0, 5, 4,
-	1, 2, 6,
-	1, 6, 5,
-	2, 3, 7,
-	2, 7, 6,
-	4, 5, 9,
-	4, 9, 8,
-	5, 6, 10,
-	5, 10, 9,
-	6, 7, 11,
-	6, 11, 10,
-	8, 9, 13,
-	8, 13, 12,
-	9, 10, 14,
-	9, 14, 13
-	};*/
-
-	
-
-
 
 	unsigned int floorIndices[] = {
 		0, 2, 1,
@@ -344,8 +269,6 @@ void CreateObjects() {
 }
 
 void CreateShaders() {
-	
-
 	Shader* shaderPNT = new Shader();
 	shaderPNT->CreateFromFiles(ptv, pTtcs, pTtes, fShader);
 	shaderList.push_back(shaderPNT);
@@ -363,16 +286,11 @@ void CreateShaders() {
 	shaderList.push_back(axisShader);
 
 	Shader* waterShader = new Shader();
-	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, fShader);
+	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, waterFrag);
 	shaderList.push_back(waterShader);
 
-	/*Shader* waterShader = new Shader();
-	waterShader->CreateFromFiles(waterVert, nurbsTcs, nurbsTes, fShader);
-	shaderList.push_back(waterShader);*/
-
-	/*Shader* axisShader1 = new Shader();
-	axisShader1->CreateFromFiles(colVS, colFS);*/
-	//shaderList.push_back(shaderPNQ);
+	oceanComputeShader = Shader();
+	oceanComputeShader.CreateFromFiles(oceanComp);
 
 	directionalShadowShader = Shader();
 	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
@@ -454,30 +372,15 @@ void RenderSceneTess() {
 		boat2Z += speed * deltaTime;
 	}
 
-	//cout << "boat1: " << boat1.maxZ << " " << boat1.minZ << std::endl;
-	//cout << "boat2: " << boat2.maxZ << " " << boat2.minZ << std::endl;
-
-	/*if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
-		boat1Z -= speed * deltaTime;
-		boat1.minZ -= speed * deltaTime;
-		boat1.maxZ -= speed * deltaTime;
-	}
-
-	if ((boat2Z + boat2.GetWidth()) + speed * deltaTime < boat1Z) {
-		boat2Z += speed * deltaTime;
-		boat2.minZ += speed * deltaTime;
-		boat2.maxZ += speed * deltaTime;
-	}*/
-
 	glm::mat4 model(1.0f);
 
 	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMeshPatches(bWireFrame);
+	meshList[0]->RenderMeshPatches(bWireFrame);*/
 
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dirtTexture.UseTexture();
@@ -512,18 +415,18 @@ void RenderSceneTess() {
 	firstRender = true;
 
 
-	//model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//plainTexture.UseTexture();
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	//meshList[3]->RenderMeshPatches(bWireFrame);
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[3]->RenderMeshPatches(bWireFrame);
 
-	//model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//plainTexture.UseTexture();
-	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	////meshList[4]->RenderMeshPatches(bWireFrame);
+	/*model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	plainTexture.UseTexture();
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[4]->RenderMeshPatches(bWireFrame);*/
 
 	glUseProgram(0);
 }
@@ -540,7 +443,7 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(5.f, 1.f, 5.f));
+	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
 	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
@@ -658,7 +561,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 &&cl
 }
 
 
-void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
+void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFrameBuffers &waterFBO) {
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	shaderList[4]->UseShader();
@@ -685,10 +588,20 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
 	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
+	
+	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
+	moveFactor = fmod(moveFactor, 1.0);
+
+	shaderList[4]->SetMoveFactor(moveFactor);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+	//waterFBO.ReadTextures();
+
 	shaderList[4]->SetTexture(1);
 	shaderList[4]->SetDirectionalShadowMap(2);
+
+	//shaderList[4]->SetReflectionTexture(3);
+	//shaderList[4]->SetRefractionTexture(4);
 
 	auto lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
@@ -701,6 +614,10 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glUseProgram(0);
 }
 
+void UpdateOceanVerts() {
+	
+}
+
 int main() {
 	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); // 1280, 1024 or 1024, 768
 	mainWindow.Initialize();
@@ -708,7 +625,7 @@ int main() {
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(-3.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
 	brickTexture = Texture("textures/brick.png");
 	brickTexture.LoadTextureA();
@@ -728,8 +645,12 @@ int main() {
 	boat2 = Model();
 	boat2.LoadModel("models/boat.obj");
 
+	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
+		glm::clamp(206.f, 0.f, 1.f),
+		glm::clamp(255.f, 0.f, 1.f));
+
 	mainLight = DirectionalLight(
-		0.678f, 0.847f, 0.902f,
+		skyblue.r, skyblue.g, skyblue.b,
 		0.1f, 0.9f,
 		-10.0f, -12.0f, -18.5f,
 		2048, 2048);
@@ -780,13 +701,6 @@ int main() {
 
 	std::vector<std::string> skyBoxFaces;
 
-	/*skyBoxFaces.push_back("textures/lightblue/right.tga");
-	skyBoxFaces.push_back("textures/lightblue/left.tga");
-	skyBoxFaces.push_back("textures/lightblue/top.tga");
-	skyBoxFaces.push_back("textures/lightblue/bot.tga");
-	skyBoxFaces.push_back("textures/lightblue/back.tga");
-	skyBoxFaces.push_back("textures/lightblue/front.tga");*/
-
 
 	skyBoxFaces.push_back("textures/clouds/right.bmp");
 	skyBoxFaces.push_back("textures/clouds/left.bmp");
@@ -798,7 +712,7 @@ int main() {
 
 	skyBox = Skybox(skyBoxFaces);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 
 	WaterFrameBuffers waterFBO = WaterFrameBuffers();
 
@@ -835,8 +749,6 @@ int main() {
 			mainWindow.getKeys()[GLFW_KEY_B] = false;
 		}
 
-		glEnable(GL_CLIP_DISTANCE0);
-
 		DirectionalShadowMapPass(&mainLight);
 
 		for (size_t i = 0; i < pointLightCount; i++) {
@@ -847,17 +759,34 @@ int main() {
 			OmniShadowMapPass(&spotLights[i]);
 		}
 
+		UpdateOceanVerts();
+
+		/*glEnable(GL_CLIP_DISTANCE0);
+
 		waterFBO.BindReflectionFrameBuffer();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, 1, 0, 0 });
+		
+		glm::vec3 cameraPos = camera.getCameraPosition();
+		float distance = 2 * cameraPos.y - 15;
+		cameraPos.y -= distance;
+		camera.setCameraPosition(cameraPos);
+		camera.invertPitch();
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
+		
 		waterFBO.UnbindCurrentFrameBuffer();
 
+		cameraPos.y += distance;
+		camera.setCameraPosition(cameraPos);
+		camera.invertPitch();
 
 		waterFBO.BindRefractionFrameBuffer();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 0 });
-		waterFBO.UnbindCurrentFrameBuffer();
-
 		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
-		OceanRenderPass(camera.calculateViewMatrix(), projection);
+		waterFBO.UnbindCurrentFrameBuffer();*/
+
+
+		glDisable(GL_CLIP_DISTANCE0);
+
+		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 10000 });
+		OceanRenderPass(camera.calculateViewMatrix(), projection, waterFBO);
 
 		glUseProgram(0);
 

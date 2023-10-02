@@ -19,6 +19,9 @@ public:
 
 	glm::vec3 getCameraPosition();
 
+	void setCameraPosition(glm::vec3 cameraPos);
+	void invertPitch();
+
 	glm::vec3 getCameraDirection();
 
 	GLfloat GetYaw() { return yaw; }

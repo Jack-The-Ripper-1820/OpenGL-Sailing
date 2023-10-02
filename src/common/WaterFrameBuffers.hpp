@@ -27,6 +27,8 @@ public:
 	WaterFrameBuffers();
 	~WaterFrameBuffers();
 
+	void ReadTextures();
+
 	void BindReflectionFrameBuffer();
 	void BindRefractionFrameBuffer();
 

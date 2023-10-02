@@ -505,6 +505,8 @@ vec2(0.8, 0.1), vec2(0.4, -0.3), vec2(0.2, 1.0), vec2(-0.3, 0.4) , vec2(7.0, -4.
 const float S[NUM_WAVES] = { 1.0, 1.2, 1.4, 1.6, 1.75, 1.74, 1.18, 1.3, 0.4, 1.8 }; // Speeds
 const float Q = 0.1;  // Steepness
 
+const float tiling = 6.0f;
+
 vec3 GerstnerWave(vec3 position, float time) {
     float displaceX = 0.0;
     float displaceY = 0.0;
@@ -513,9 +515,9 @@ vec3 GerstnerWave(vec3 position, float time) {
     for (int i = 0; i < NUM_WAVES; i++) {
         float waveFactor = D[i].x * position.x + D[i].y * position.z - S[i] * time;
 
-        displaceX += (gl_VertexID % 4 == 0) ? Q * A[i] * sin(waveFactor) : Q * A[i] * cos(waveFactor);
+        displaceX += ((gl_VertexID % 4 == 0) ? Q * A[i] * sin(waveFactor) : Q * A[i] * cos(waveFactor)) * 0.1;
         displaceY += (gl_VertexID % 2 == 0) ? A[i] * cos(waveFactor) : 0;
-        displaceZ += (gl_VertexID % 2 == 1) ? Q * A[i] * sin(waveFactor) : 0;
+        displaceZ += 0;// (gl_VertexID % 2 == 1) ? Q * A[i] * sin(waveFactor) : 0;
     }
 
     return vec3(position.x + displaceX, position.y + displaceY, position.z + displaceZ);
@@ -549,12 +551,12 @@ vec3 ComputeGerstnerNormal(vec3 position, float time) {
 
 
 void main() {
-    vec3 displacedPos = gl_VertexID % 2 == 0 ? GerstnerWave(pos, time) : GerstnerWave(pos, time);
+    vec3 displacedPos =  GerstnerWave(pos, time);
     FragPos = vec3(model * vec4(displacedPos, 1.0));
     //gl_Position = projection * view * vec4(FragPos, 1.0);
     vCol = vec4(clamp(col, 0.0, 1.0), 1.0);
     TexCoord = tex;
-    Normal = norm; // ComputeGerstnerNormal(pos, time);
+    Normal = norm;
 }
 
 

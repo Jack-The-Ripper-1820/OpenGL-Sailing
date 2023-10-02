@@ -168,6 +168,11 @@ GLuint Shader::GetClipPlaneLocation()
 	return uniformClipPlane;
 }
 
+GLuint Shader::GetMoveFactorLocation()
+{
+	return uniformMoveFactor;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -246,6 +251,21 @@ void Shader::SetClipPlane(glm::vec4 &&clipPlane)
 	glUniform4f(uniformClipPlane, clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w);
 }
 
+void Shader::SetReflectionTexture(GLuint textureUnit)
+{
+	glUniform1i(uniformReflectionTexture, textureUnit);
+}
+
+void Shader::SetRefractionTexture(GLuint textureUnit)
+{
+	glUniform1i(uniformRefractionTexture, textureUnit);
+}
+
+void Shader::SetMoveFactor(float moveFactor)
+{
+	glUniform1f(uniformMoveFactor, moveFactor);
+}
+
 void Shader::CompileProgram()
 {
 	GLint result = 0;
@@ -318,6 +338,10 @@ void Shader::CompileProgram()
 	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
 	uniformTime = glGetUniformLocation(shaderID, "time");
 	uniformClipPlane = glGetUniformLocation(shaderID, "clipPlane");
+
+	uniformReflectionTexture = glGetUniformLocation(shaderID, "reflectionTexture");
+	uniformRefractionTexture = glGetUniformLocation(shaderID, "refractionTexture");
+	uniformMoveFactor = glGetUniformLocation(shaderID, "moveFactor");
 }
 
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) {

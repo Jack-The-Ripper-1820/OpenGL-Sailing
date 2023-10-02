@@ -80,6 +80,16 @@ glm::vec3 Camera::getCameraPosition()
 	return position;
 }
 
+void Camera::setCameraPosition(glm::vec3 cameraPos)
+{
+	position = cameraPos;
+}
+
+void Camera::invertPitch()
+{
+	pitch = -pitch;
+}
+
 glm::vec3 Camera::getCameraDirection()
 {
 	return glm::vec3();
