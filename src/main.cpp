@@ -240,22 +240,22 @@ void CreateObjects() {
 	Utils::calcAverageNormal(oceanIndices, 18 * 3, oceanVertices, 11 * 16, 11, 8);
 
 
-	Mesh* obj1 = new Mesh();
+	Mesh* obj1 = new Mesh(0);
 	obj1->CreateMesh(vertices, indices, 44, 12);
 
-	Mesh* obj2 = new Mesh();
+	Mesh* obj2 = new Mesh(1);
 	obj2->CreateMesh(vertices, indices, 44, 12);
 
-	Mesh* obj3 = new Mesh();
+	Mesh* obj3 = new Mesh(2);
 	obj3->CreateMesh(floorVertices, floorIndices, 44, 6);
 
-	Mesh* obj4 = new Mesh();
+	Mesh* obj4 = new Mesh(3);
 	obj4->CreateMesh(boatVertices, boatIndices, 11 * 12, 12);
 
-	Mesh* obj5 = new Mesh();
+	Mesh* obj5 = new Mesh(4);
 	obj5->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
 
-	Mesh* obj6 = new Mesh();
+	Mesh* obj6 = new Mesh(5);
 	obj6->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
 
 	meshList.push_back(obj1);
@@ -347,12 +347,137 @@ void RenderScene() {
 	glUseProgram(0);
 }
 
-float boat1Z = 10.f, boat2Z = -10.f;
+float boat1X = 2.0f, boat1Y = 1.0f, boat1Z = 10.f;
+float boat2X = 2.0f, boat2Y = 1.0f, boat2Z = -10.f;
 float speed = 0.1f;
-bool firstRender = false;
+bool bFirstRender = true;
+bool bca = false, bcb = false;
 
 void RenderSceneTess() {
-	if (firstRender) {
+	glm::mat4 model(1.0f);
+
+	float d1Z = -speed * deltaTime;
+	float d2Z = speed * deltaTime;
+	float newBoat1Z = boat1Z + d1Z;
+	float newBoat2Z = boat2Z + d2Z;
+
+	glm::mat4 model1(1.0f);
+	model1 = glm::translate(model1, glm::vec3(boat1X, boat1Y, newBoat1Z));
+	model1 = glm::scale(model1, glm::vec3(0.1f, 0.1f, 0.1f));
+
+	glm::mat4 model2(1.0f);
+	model2 = glm::translate(model2, glm::vec3(boat2X, boat2Y, newBoat2Z));
+	model2 = glm::rotate(model2, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	model2 = glm::scale(model2, glm::vec3(0.1f, 0.1f, 0.1f));
+
+	//boat1.TransformColliders(model1);
+	//boat2.TransformColliders(model2);
+
+	if (bFirstRender && !bca && !bcb) {
+		meshList[0]->TransformCollider(model1);
+		meshList[1]->TransformCollider(model2);
+		bFirstRender = false;
+	}
+	
+	else if(!bca && !bcb) {
+		meshList[0]->TranslateCollider(glm::vec3(0, 0, d1Z));
+		meshList[1]->TranslateCollider(glm::vec3(0, 0, d2Z));
+	}
+
+	if (!bca && !bcb && !meshList[0]->IsColliding(meshList[1])) {
+		boat1Z = newBoat1Z;
+		//boat2Z = newBoat2Z;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		//boat1.RenderModelPatches(bWireFrame);
+		//meshList[0]->RenderMeshPatches(bWireFrame);
+		/*glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model2));
+		glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);*/
+		//meshList[1]->RenderMeshPatches(bWireFrame);
+		//boat2.RenderModelPatches(bWireFrame);
+	}
+
+	else {
+		std::cout << "else 1" << std::endl;
+		model = glm::translate(model, glm::vec3(boat1X, boat1Y, boat1Z));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		bca = true;
+	}
+
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[0]->RenderMeshPatches(bWireFrame);
+
+
+	if(!bca && !bcb && !meshList[1]->IsColliding(meshList[0])) {
+		//boat1Z = newBoat1Z;
+		boat2Z = newBoat2Z;
+		/*glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);*/
+		//boat1.RenderModelPatches(bWireFrame);
+		//meshList[0]->RenderMeshPatches(bWireFrame);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model2));
+		//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		//meshList[1]->RenderMeshPatches(bWireFrame);
+		//boat2.RenderModelPatches(bWireFrame);
+	}
+
+	else {
+		model = glm::mat4(1.0);
+		std::cout << "else 2" << std::endl;
+		model = glm::translate(model, glm::vec3(boat2X, boat2Y, boat2Z));
+		model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		bcb = true;
+	}
+
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	meshList[1]->RenderMeshPatches(bWireFrame);
+
+
+	//if (!meshList[0]->IsColliding(meshList[1]) && !meshList[1]->IsColliding(meshList[0])) {
+	//	boat1Z = newBoat1Z;
+	//	boat2Z = newBoat2Z;
+	//	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+	//	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//	//boat1.RenderModelPatches(bWireFrame);
+	//	//meshList[0]->RenderMeshPatches(bWireFrame);
+	//	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model2));
+	//	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//	//meshList[1]->RenderMeshPatches(bWireFrame);
+	//	//boat2.RenderModelPatches(bWireFrame);
+	//}
+
+
+
+	/*model = glm::translate(model, glm::vec3(2.0f, 1.0f, newBoat1Z));
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+	boat1.TransformColliders(model);
+
+	if (!boat1.IsColliding(boat2)) {
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		boat1Z = newBoat1Z;
+	}
+
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	boat1.RenderModelPatches(bWireFrame);
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(2.0f, 1.0f, newBoat2Z));
+	model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+	boat2.TransformColliders(model);
+
+	if (!boat2.IsColliding(boat1)) {
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		boat2Z = newBoat2Z;
+	}
+
+	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	boat2.RenderModelPatches(bWireFrame);*/
+
+	/*if (firstRender) {
 		if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
 			boat1Z -= speed * deltaTime;
 			boat1.minZ += speed * deltaTime;
@@ -364,15 +489,27 @@ void RenderSceneTess() {
 			boat2.minZ -= speed * deltaTime;
 			boat2.maxZ -= speed * deltaTime;
 		}
-	}
-	
-	
-	else {
+	}*/
+	//
+	//
+	//else {
+	//	boat1Z -= speed * deltaTime;
+	//	boat2Z += speed * deltaTime;
+	//}
+
+	/*if ((boat1Z - boat1.GetWidth()) - speed * deltaTime > boat2Z) {
 		boat1Z -= speed * deltaTime;
-		boat2Z += speed * deltaTime;
+		boat1.minZ += speed * deltaTime;
+		boat1.maxZ += speed * deltaTime;
 	}
 
-	glm::mat4 model(1.0f);
+	if ((boat2Z + boat2.GetWidth()) + speed * deltaTime < boat1Z) {
+		boat2Z += speed * deltaTime;
+		boat2.minZ -= speed * deltaTime;
+		boat2.maxZ -= speed * deltaTime;
+	}*/
+
+	
 
 	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -387,32 +524,43 @@ void RenderSceneTess() {
 	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[1]->RenderMeshPatches(bWireFrame);*/
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat1Z));
-	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat1.RenderModelPatches(bWireFrame);
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat1Z));
+	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
-	if (firstRender == false) {
+	//boat1.TransformColliders(model);
+
+	///*boat1.SetPosition(boat1.posX, boat1.posY, boat1.posZ - speed * deltaTime, uniformModel);
+	//boat1.SetScale(0.1f, 0.1f, 0.1f, uniformModel);*/
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//boat1.RenderModelPatches(bWireFrame);
+
+	/*if (firstRender == false) {
 		boat1.minZ = model[2][0] * boat1.minZ + model[2][1] * boat1.minZ + model[2][2] * boat1.minZ + model[2][3];
 		boat1.maxZ = model[2][0] * boat1.maxZ + model[2][1] * boat1.maxZ + model[2][2] * boat1.maxZ + model[2][3];
-	}
+	}*/
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat2Z));
-	model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
-	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat2.RenderModelPatches(bWireFrame);
+	//model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(2.0f, 1.0f, boat2Z));
+	//model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+	//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));*/
+	///*boat2.SetPosition(boat2.posX, boat2.posY, boat2.posZ + speed * deltaTime, uniformModel);
+	//boat2.SetRotation(glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f), uniformModel);
+	//boat2.SetScale(0.1f, 0.1f, 0.1f, uniformModel);*/
 
-	if (firstRender == false) {
+	//boat2.TransformColliders(model);
+
+
+	//glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	//boat2.RenderModelPatches(bWireFrame);
+
+	/*if (firstRender == false) {
 		boat2.minZ = model[2][0] * boat2.minZ + model[2][1] * boat2.minZ + model[2][2] * boat2.minZ + model[2][3];
 		boat2.maxZ = model[2][0] * boat2.maxZ + model[2][1] * boat2.maxZ + model[2][2] * boat2.maxZ + model[2][3];
-	}
+	}*/
 
-	firstRender = true;
 
 
 	model = glm::mat4(1.0f);
@@ -622,8 +770,9 @@ int main() {
 	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); // 1280, 1024 or 1024, 768
 	mainWindow.Initialize();
 
-	CreateObjects();
 	CreateShaders();
+	CreateObjects();
+
 
 	camera = Camera(glm::vec3(-3.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
@@ -639,11 +788,11 @@ int main() {
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	boat1 = Model();
-	boat1.LoadModel("models/boat.obj");
+	boat1 = Model(1);
+	//boat1.LoadModel("models/boat.obj");
 
-	boat2 = Model();
-	boat2.LoadModel("models/boat.obj");
+	boat2 = Model(2);
+	//boat2.LoadModel("models/boat.obj");
 
 	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
 		glm::clamp(206.f, 0.f, 1.f),

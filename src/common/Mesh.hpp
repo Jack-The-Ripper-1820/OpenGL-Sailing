@@ -6,12 +6,16 @@
 #include <stdio.h>
 #include <vector>
 
+#include "Collider.hpp"
+
 using namespace std;
 
 class Mesh {
 public:
-	Mesh();
 
+	Mesh();
+	Mesh(int ID);
+	int ID;
 	void CreateMesh(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numOfIndices);
 	void RenderMesh(bool bWireFrame = false);
 	void RenderMeshPatches(bool bWireFrame = false);
@@ -22,11 +26,19 @@ public:
 	void CreateWaterMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 	pair<glm::vec3, glm::vec3> GetBoundaries();
 
+	Collider* GetCollider() const { return collider; }
+
+	bool IsColliding(const Mesh* other);
+	void TransformCollider(glm::mat4 const& transform);
+	void TranslateCollider(glm::vec3 const& dVector);
+
 	~Mesh();
 
-	glm::mat4 model;
+	glm::mat4 model;	
+	glm::vec3 minBounds, maxBounds;
 
 private:
+	Collider* collider;
 	GLuint VAO, VBO, IBO;
 	GLsizei indexCount;
 	GLuint controlpointVBO;

@@ -1,4 +1,5 @@
 #include <Mesh.hpp>
+#include <iostream>
 
 Mesh::Mesh() : model(1.f) {
 	VAO = 0;
@@ -7,7 +8,15 @@ Mesh::Mesh() : model(1.f) {
 	indexCount = 0;
 }
 
+Mesh::Mesh(int ID) : Mesh()
+{
+	this->ID = ID;
+}
+
 void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices) {
+	std::cout << minX << " " << minY << " " << minZ << std::endl <<
+		maxX << " " << maxY << " " << maxZ << std::endl << std::endl;
+	
 	for (unsigned int i = 0; i < numOfVertices; i += 11) {
 		minX = min(minX, vertices[i]);
 		maxX = max(maxX, vertices[i]);
@@ -18,6 +27,7 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 		minZ = min(minZ, vertices[i + 2]);
 		maxZ = max(maxZ, vertices[i + 2]);
 	}
+
 	
 	indexCount = numOfIndices;
 
@@ -48,6 +58,18 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+
+	minBounds = glm::vec3(minX, minY, minZ);
+	maxBounds = glm::vec3(maxX, maxY, maxZ);
+
+	minBounds = glm::vec3(glm::mat4(1.0) * glm::vec4(minBounds, 1));
+	maxBounds = glm::vec3(glm::mat4(1.0) * glm::vec4(maxBounds, 1));
+
+
+	collider = new Collider(minBounds, maxBounds, ID);  // compute minBounds and maxBounds based on the mesh's vertices
+	std::cout << minX << " " << minY << " " << minZ << std::endl <<
+		maxX << " " << maxY << " " << maxZ << std::endl << std::endl;
+
 }
 
 
@@ -169,6 +191,22 @@ void Mesh::ConvertPointsToPatches(GLfloat* controlpoints)
 
 }
 
+bool Mesh::IsColliding(const Mesh* other)
+{
+	return collider->IsColliding(*(other->collider));
+}
+
+void Mesh::TransformCollider(glm::mat4 const& transform)
+{
+	collider->Transform(transform);
+}
+
+void Mesh::TranslateCollider(glm::vec3 const& dVector)
+{
+	collider->Translate(dVector);
+}
+
 Mesh::~Mesh() {
 	ClearMesh();
+	delete collider;
 }
