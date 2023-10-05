@@ -39,24 +39,24 @@ bool Collider::IsColliding(const Collider& other)
 {
 	//std::cout << minBounds.x << " " << other.minBounds.x << std::endl;
 
-	if (printFlag) {
-		std::cout << "in colliding: " << ID << std::endl;
+	//if (printFlag) {
+		/*std::cout << "in colliding: " << ID << std::endl;
 		std::cout << minBounds.x << " " << minBounds.y << " " << minBounds.z << std::endl;
 		std::cout << maxBounds.x << " " << maxBounds.y << " " << maxBounds.z << std::endl;
 		std::cout << other.minBounds.x << " " << other.minBounds.y << " " << other.minBounds.z << std::endl;
 		std::cout << other.maxBounds.x << " " << other.maxBounds.y << " " << other.maxBounds.z << std::endl;
-		printFlag = false;
-	}
+		printFlag = false;*/
+	//}
 	auto inRange = [](float value, float min, float max) {
 		return value >= min && value <= max;
 	};
 
 	return (inRange(minBounds.x, other.minBounds.x, other.maxBounds.x) ||
-		inRange(maxBounds.x, other.maxBounds.x, other.maxBounds.x)) &&
+		inRange(maxBounds.x, other.minBounds.x, other.maxBounds.x)) &&
 		(inRange(minBounds.y, other.minBounds.y, other.maxBounds.y) ||
-			inRange(maxBounds.y, other.maxBounds.y, other.maxBounds.y)) &&
+			inRange(maxBounds.y, other.minBounds.y, other.maxBounds.y)) &&
 		(inRange(minBounds.z, other.minBounds.z, other.maxBounds.z) ||
-			inRange(maxBounds.z, other.maxBounds.z, other.maxBounds.z));
+			inRange(maxBounds.z, other.minBounds.z, other.maxBounds.z));
 
 	/*return (minBounds.x <= other.maxBounds.x && maxBounds.x >= other.minBounds.x) &&
 		(minBounds.y <= other.maxBounds.y && maxBounds.y >= other.minBounds.y) &&
@@ -76,6 +76,11 @@ void Collider::Transform(const glm::mat4& transform)
 {
 	minBounds = glm::vec3(transform * glm::vec4(minBounds, 1.0f));
 	maxBounds = glm::vec3(transform * glm::vec4(maxBounds, 1.0f));
+
+	std::cout << "TRANSFORM" << std::endl;
+
+	std::cout << minBounds.x << " " << minBounds.y << " " << minBounds.z << std::endl;
+	std::cout << maxBounds.x << " " << maxBounds.y << " " << maxBounds.z << std::endl << std::endl;
 
 	//minBounds.z += 
 

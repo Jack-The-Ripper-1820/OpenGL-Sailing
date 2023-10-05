@@ -204,6 +204,8 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 	}
 
 	Mesh* newMesh = new Mesh(ID);
+	//cout << "VERTCIES SIZE: " << vertices.size() << " " << (int)vertices.size() % 11 << " " << ++cnt << endl;
+
 	newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size());
 	meshList.push_back(newMesh);
 	meshToTexture.push_back(mesh->mMaterialIndex);

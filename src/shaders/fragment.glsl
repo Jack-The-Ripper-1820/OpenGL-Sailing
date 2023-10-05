@@ -228,8 +228,8 @@ void main()
 	DirectionalLightSpacePos = directionalLightTransform * model * vec4(FragPos, 1.0);
 
 	vec4 finalColor = CalcDirectionalLight(DirectionalLightSpacePos);
-	//finalColor += CalcPointLights();
-	//finalColor += CalcSpotLights();
+	finalColor += CalcPointLights();
+	finalColor += CalcSpotLights();
 	
 	color = texture(theTexture, TexCoord) * vCol * finalColor;
 }
