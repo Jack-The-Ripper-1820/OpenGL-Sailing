@@ -37,6 +37,10 @@ public:
 	glm::mat4 model;	
 	glm::vec3 minBounds, maxBounds;
 
+	void SetEdges(vector<pair<glm::vec3, glm::vec3>> &edges) {
+		this->collider->edges = edges;
+	}
+
 private:
 	Collider* collider;
 	GLuint VAO, VBO, IBO;

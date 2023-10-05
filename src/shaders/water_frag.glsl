@@ -237,7 +237,7 @@ void main()
 
 	vec4 finalColor = CalcDirectionalLight(DirectionalLightSpacePos);
 	finalColor += CalcPointLights();
-	finalColor += CalcSpotLights();
+	//finalColor += CalcSpotLights();
 
 	//vec4 reflectColor = texture(reflectionTexture, TexCoord);
 	//vec4 refractColor = texture(refractionTexture, TexCoord);
@@ -255,6 +255,7 @@ void main()
 	vec4 newTexColor = texture(theTexture, newTexCoord);
 
 	color = newTexColor * vCol * finalColor;
+	color = newTexColor *  finalColor;
 	//color = mix(reflectColor, refractColor, 0.5) * finalColor;
 
 }
