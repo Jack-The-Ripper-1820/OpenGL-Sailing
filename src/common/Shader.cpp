@@ -246,7 +246,7 @@ void Shader::SetTime(float time)
 	glUniform1f(uniformTime, time);
 }
 
-void Shader::SetClipPlane(glm::vec4 &&clipPlane)
+void Shader::SetClipPlane(glm::vec4 clipPlane)
 {
 	glUniform4f(uniformClipPlane, clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w);
 }
@@ -478,6 +478,7 @@ GLuint Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shade
 }
 
 void Shader::UseShader() {
+	glUseProgram(0);
 	//std::cout << "using: " << shaderID << std::endl;
 	glUseProgram(shaderID);
 }

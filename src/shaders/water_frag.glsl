@@ -66,8 +66,8 @@ uniform OmniShadowMap omniShadowMaps[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 
 uniform sampler2D theTexture;
 uniform sampler2D directionalShadowMap;
-uniform sampler2D reflectionTexture;
-uniform sampler2D refractionTexture;
+//uniform sampler2D reflectionTexture;
+//uniform sampler2D refractionTexture;
 
 uniform Material material;
 
@@ -236,11 +236,11 @@ void main()
 	DirectionalLightSpacePos = directionalLightTransform * model * vec4(FragPos, 1.0);
 
 	vec4 finalColor = CalcDirectionalLight(DirectionalLightSpacePos);
-	//finalColor += CalcPointLights();
-	//finalColor += CalcSpotLights();
+	finalColor += CalcPointLights();
+	finalColor += CalcSpotLights();
 
-	vec4 reflectColor = texture(reflectionTexture, TexCoord);
-	vec4 refractColor = texture(refractionTexture, TexCoord);
+	//vec4 reflectColor = texture(reflectionTexture, TexCoord);
+	//vec4 refractColor = texture(refractionTexture, TexCoord);
 
 	vec2 distortion1 = (texture(theTexture, vec2(TexCoord.x + moveFactor, TexCoord.y)).rg * 2.0 - 1.0) * waveStrength;
 	vec2 distortion2 = (texture(theTexture, vec2(-TexCoord.x + moveFactor, TexCoord.y + moveFactor)).rg * 2.0 - 1.0) * waveStrength;

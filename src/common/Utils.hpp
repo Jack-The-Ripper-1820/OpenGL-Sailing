@@ -13,4 +13,8 @@ public:
 	static void calcAverageNormal(unsigned int* indices, unsigned int indexCount,
 		GLfloat* vertices, unsigned int vertexCount, unsigned int vertexLength,
 		unsigned int normalOffset);
+
+	static void calcAverageNormalForQuads(unsigned int* indices, unsigned int indexCount,
+		GLfloat* vertices, unsigned int vertexCount, unsigned int vertexLength,
+		unsigned int normalOffset);
 };

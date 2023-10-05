@@ -55,7 +55,7 @@ public:
 	void SetOmniLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTessellationLevel(float level);
 	void SetTime(float time);
-	void SetClipPlane(glm::vec4 &&clipPlane);
+	void SetClipPlane(glm::vec4 clipPlane);
 	void SetReflectionTexture(GLuint textureUnit);
 	void SetRefractionTexture(GLuint textureUnit);
 	void SetMoveFactor(float moveFactor);
