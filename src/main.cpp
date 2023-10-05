@@ -508,8 +508,8 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 clip
 	shaderList[0]->SetTessellationLevel(tessLevel);
 
 	shaderList[0]->SetDirectionalLight(&mainLight);
-	shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[0]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	//shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
+	//shaderList[0]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
 	shaderList[0]->SetDirectionalLightTransform(&lightTansform);
 
@@ -598,8 +598,8 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFram
 	shaderList[4]->SetTessellationLevel(16);
 
 	shaderList[4]->SetDirectionalLight(&mainLight);
-	shaderList[4]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	//shaderList[4]->SetPointLights(pointLights, pointLightCount, 3, 0);
+	//shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lightTansform = mainLight.CalcLightTransform();
 	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
 	
@@ -666,20 +666,10 @@ int main() {
 
 	mainLight = DirectionalLight(
 		skyblue.r, skyblue.g, skyblue.b,
-		0.1f, 0.9f,
+		0.6f, 0.9f,
 		//-10.0f, -12.0f, -18.5f,
 		-20.0f, -20.0f, 0.0f,
 		2048, 2048);
-
-	pointLights[1] = PointLight(
-		0.678, 0.847, 0.902,
-		0.0f, 0.4f,
-		2.0f, 2.0f, 0.0f,
-		0.3f, 0.01f, 0.01f,
-		1024, 1024,
-		0.1f, 100.0f);
-
-	pointLightCount++;
 
 	pointLights[0] = PointLight(
 		0.400, 0.600, 1.000,
