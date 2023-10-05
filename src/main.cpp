@@ -102,104 +102,6 @@ uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0,
 uniformTime = 0;
 
 void CreateObjects() {
-
-	GLfloat boatVertices[] = {
-		// Base (Triangle 1)
-		0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-
-		// Left Side (Triangle 2)
-		0.0f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, -1.0f, 0.0f, 0.0f,
-		-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-
-		// Right Side (Triangle 3)
-		0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		0.5f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-
-		// Back (Triangle 4)
-		-0.5f, 0.0f, -0.5f, 0.5f, 0.5f, 0.5f, 0.0f, 0.5f, -1.0f, 0.0f, 0.0f,
-		0.5f, 0.0f, -0.5f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, -1.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f,
-	};
-
-	unsigned int boatIndices[] = {
-		0, 1, 2, // Triangle 1 (Base)
-		3, 4, 5, // Triangle 2 (Left Side)
-		6, 7, 8, // Triangle 3 (Right Side)
-		9, 10, 11, // Triangle 4 (Back)
-	};
-
-
-	//unsigned int indices[] = {
-	//	0, 3, 1,
-	//	1, 3, 2,
-	//	2, 3, 0,
-	//	0, 1, 2
-	//};
-
-	//GLfloat vertices[] = {
-	//	//  x      y      z         r,g,b        u      v       nx,    ny,   nz
-	//		-1.0f, -1.0f, -0.6f,   1,1,1,   0.0f, 0.0f,    0.0f, 0.0f, 0.0f,
-	//		0.0f, -1.0f, 1.0f,     1,1,1,   0.5f, 0.f,	  0.0f, 0.0f, 0.0f,
-	//		1.0f, -1.0f, -0.6f,    1,1,1,    1.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
-	//		0.0f, 1.0f, 0.0f,      1,1,1,     0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
-	//};
-
-	//unsigned int indices[] = {
-	//0, 1, 2,        // Base triangle
-	//3, 4, 5,        // Top triangle
-	//0, 1, 4, 
-	//0, 4, 3,   
-	//1, 2, 5,
-	//1, 5, 4,   
-	//2, 0, 3, 
-	//2, 3, 5    
-	//};
-
-	//unsigned int indices[] = {
-	//0, 2, 1,
-	//0, 4, 1,
-	//0, 3, 4,
-	//1, 5, 2,
-	//1, 4, 5,
-	//2, 3, 0,
-	//2, 5, 3,
-	//3, 5, 4
-	//};
-
-
-
-	//GLfloat vertices[] = {
-	//	//  x      y      z         r,g,b        u      v       nx,    ny,   nz
-	//		-1.0f, 0.0f, -1.0f,     1,1,1,   0.0f, 0.0f,    0.0f, 0.0f, 0.0f,
-	//		1.0f, 0.0f, -1.0f,      1,1,1,   0.5f, 0.0f,	  0.0f, 0.0f, 0.0f,
-	//		0.0f, 0.0f, 2.0f,      1,1,1,   1.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
-	//		-1.0f, 2.0f, -1.0f,      1,1,1,   0.0f, 1.0f,	  0.0f, 0.0f, 0.0f,
-	//		1.0f, 2.0f, -1.0f,       1,1,1,   0.5f, 1.0f,	  0.0f, 0.0f, 0.0f,
-	//		0.0f, 2.0f, 2.0f,        1,1,1,   1.0f, 1.0f,	  0.0f, 0.0f, 0.0f,
-	//};
-
-	//unsigned int indices[] = {
-	//0, 1, 2, //
-	//0, 3, 1, //
-	//0, 2, 4,//
-	//4, 2, 1, //
-	//1, 3, 4, //
-	//0, 4, 3 //
-	//};
-
-	//unsigned int indices[] = {
-	//0, 1, 2,
-	//2, 1, 4,
-	//4, 1, 3,
-	//3, 1, 0,
-	//0, 2, 4,
-	////4, 3, 0
-	//};
-
 	unsigned int indices[] = {
 	0, 2, 1,
 	2, 4, 1,
@@ -209,42 +111,29 @@ void CreateObjects() {
 	//4, 3, 0
 	};
 
-	/*unsigned int indices[] = {
-	0, 1, 2,
-	0, 2, 4,
-	0, 4, 3,
-	0, 3, 1,
-	1, 3, 4,
-	1, 4, 2
-	};*/
-
-	/*unsigned int indices[] = {
-	0, 1, 2,
-	1, 2, 4,
-	1, 4, 3,
-	1, 3, 0,
-	0, 2, 4,
-	3, 4, 0
-	};*/
-
-	/*unsigned int indices[] = {
-	0, 1, 2,
-	1, 2, 4,
-	1, 4, 3,
-	1, 3, 0,
-	0, 2, 4,
-	3, 4, 0
-	};*/
-
 
 	GLfloat vertices[] = {
 		//  x      y      z         r,g,b        u      v       nx,    ny,   nz
-			0.0f, 0.0f, -4.0f,     1,1,1,   0.5f, 0.5f,    0.0f, 0.0f, 0.0f,
-			-0.5f, 0.0f, -1.0f,      1,1,1,   0.5f, 0.0f,	  0.0f, 0.0f, 0.0f,
-			0.5f, 0.0f, -1.0f,      1,1,1,   0.5f, 0.5f,	  0.0f, 0.0f, 0.0f,
-			-1.0f, 0.5f, -1.0f,      1,1,1,   0.0f, 1.0f,	  0.0f, 0.0f, 0.0f,
-			1.0f, 0.5f, -1.0f,       1,1,1,   0.5f, 0.5f,	  0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, -4.0f,     1,1,1,   0.5f, 1.0f,    0.0f, 0.0f, 0.0f,
+			-0.5f, 0.0f, -1.0f,      1,1,1,   0.25f, 0.5f,	  0.0f, 0.0f, 0.0f,
+			0.5f, 0.0f, -1.0f,      1,1,1,   0.75f, 0.5f,	  0.0f, 0.0f, 0.0f,
+			-1.0f, 0.5f, -1.0f,      1,1,1,   0.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
+			1.0f, 0.5f, -1.0f,       1,1,1,   1.0f, 0.0f,	  0.0f, 0.0f, 0.0f,
 	};
+
+	vector<pair<glm::vec3, glm::vec3>> edges1 = {
+		{ glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(-0.5f, 0.0f, -1.0f)}, // 0 1
+		{ glm::vec3(-0.5f, 0.0f, -1.0f), glm::vec3(0.5f, 0.0f, -1.0f)}, // 1 2
+		{ glm::vec3(0.5f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -4.0f)}, // 2 0
+		{ glm::vec3(-0.5f, 0.0f, -1.0f), glm::vec3(0.5f, 0.0f, -1.0f)}, // 1 2
+		{ glm::vec3(0.5f, 0.0f, -1.0f), glm::vec3(1.0f, 0.5f, -1.0f)}, // 2 4
+		{ glm::vec3(1.0f, 0.5f, -1.0f), glm::vec3(-1.0f, 0.5f, -1.0f)}, // 4 3
+		{ glm::vec3(-1.0f, 0.5f, -1.0f), glm::vec3(-0.5f, 0.0f, -1.0f)}, // 3 1
+		{ glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(-1.0f, 0.5f, -1.0f) }, // 0 3
+		{ glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(1.0f, 0.5f, -1.0f)}, // 0 4
+	};
+
+	vector<pair<glm::vec3, glm::vec3>> edges2 = edges1;
 
 	unsigned int sailIndices[] = {
 		0,1,2,3
@@ -256,13 +145,6 @@ void CreateObjects() {
 		//2,0,3
 	};
 
-
-	/*GLfloat sailVertices[] = {
-		0.0, 0.0, -2.0,  1.0,1.0,1.0,  0.0,0.0,  0.0,0.0,0.0,
-		1.0, 0.5, -2.0,  1.0,1.0,1.0,  0.0,0.5,  0.0,0.0,0.0,
-		0.0, 1.0, -2.0,  1.0,1.0,1.0,  0.5,0.5,  0.0,0.0,0.0,
-		-1.0, 0.5, -2.0, 1.0,1.0,1.0,  1.0,1.0,  0.0,0.0,0.0    
-	};*/
 
 	GLfloat sailVertices[] = {
 		0.0, 0.0, 0.0,  1.0,1.0,1.0,  0.0,0.0,  0.0,0.0,0.0,
@@ -323,18 +205,6 @@ void CreateObjects() {
 	10, 15, 14
 	};
 
-	unsigned int floorIndices[] = {
-		0, 2, 1,
-		1, 2, 3
-	};
-
-	GLfloat floorVertices[] = {
-		-10.0f, 0.0f, -10.0f,	1,1,1,    0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, -10.0f,	1,1,1,    10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
-		-10.0f, 0.0f, 10.0f,	1,1,1,    0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, 10.0f,		1,1,1,    10.0f, 10.0f,	0.0f, -1.0f, 0.0f
-	};
-
 	unsigned int axesIndices[] = {
 		0, 1, // X-axis
 		2, 3, // Y-axis
@@ -352,55 +222,40 @@ void CreateObjects() {
 
 	};
 
-	//Utils::calcAverageNormal(indices, 12, vertices, 44, 11, 8);
-	
-	//Utils::calcAverageNormal(indices, 24, vertices, 66, 11, 8);
 
 	Utils::calcAverageNormal(indices, 3 * 5, vertices, 5 * 11, 11, 8);
 
-	Utils::calcAverageNormal(boatIndices, 12, boatVertices, 11 * 12, 11, 8);
 	Utils::calcAverageNormal(oceanIndices, 18 * 3, oceanVertices, 11 * 16, 11, 8);
 
 	Utils::calcAverageNormalForQuads(sailIndices, 4, sailVertices, 11 * 4, 11, 8);
 	Utils::calcAverageNormalForQuads(sail2Indices, 4, sail2Vertices, 11 * 4, 11, 8);
 
-	//Utils::calcAverageNormal(sailIndices, 3 * 2, sailVertices, 11 * 4, 11, 8);
 
 	Mesh* obj1 = new Mesh(0);
-	//obj1->CreateMesh(vertices, indices, 44, 12);
-
-	//obj1->CreateMesh(vertices, indices, 66, 24);
 
 	obj1->CreateMesh(vertices, indices, 5 * 11, 3 * 5);
 
+	obj1->SetEdges(edges1);
+
 	Mesh* obj2 = new Mesh(1);
-	//obj2->CreateMesh(vertices, indices, 44, 12);
-	//obj2->CreateMesh(vertices, indices, 66, 24);
 
 	obj2->CreateMesh(vertices, indices, 5 * 11, 3 * 5);
 
+	obj2->SetEdges(edges2);
 
-	Mesh* obj3 = new Mesh(2);
-	obj3->CreateMesh(floorVertices, floorIndices, 44, 6);
+	Mesh* obj3 = new Mesh(4);
+	obj3->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
 
-	Mesh* obj4 = new Mesh(3);
-	obj4->CreateMesh(boatVertices, boatIndices, 11 * 12, 12);
+	Mesh* obj4 = new Mesh(5);
+	obj4->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
 
-	Mesh* obj5 = new Mesh(4);
-	obj5->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
+	Mesh* obj5 = new Mesh(6);
 
-	Mesh* obj6 = new Mesh(5);
-	obj6->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
+	obj5->CreateMesh(sailVertices, sailIndices, 11 * 4, 4 * 1);
 
-	Mesh* obj7 = new Mesh(6);
-	//obj7->CreateMesh(sailVertices, sailIndices, 11 * 4,  3 * 2);
+	Mesh* obj6 = new Mesh(7);
 
-	obj7->CreateMesh(sailVertices, sailIndices, 11 * 4, 4 * 1);
-
-	Mesh* obj8 = new Mesh(7);
-	//obj7->CreateMesh(sailVertices, sailIndices, 11 * 4,  3 * 2);
-
-	obj8->CreateMesh(sail2Vertices, sail2Indices, 11 * 4, 4 * 1);
+	obj6->CreateMesh(sail2Vertices, sail2Indices, 11 * 4, 4 * 1);
 
 
 	meshList.push_back(obj1);
@@ -409,8 +264,6 @@ void CreateObjects() {
 	meshList.push_back(obj4);
 	meshList.push_back(obj5);
 	meshList.push_back(obj6);
-	meshList.push_back(obj7);
-	meshList.push_back(obj8);
 
 }
 
@@ -445,55 +298,7 @@ void CreateShaders() {
 		"shaders/omni_directional_shadow_map_fragment.glsl");
 }
 
-void RenderScene() {
-	glm::mat4 model(1.0f);
-
-	/*model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	brickTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMesh();*/
-
-	/*model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	dirtTexture.UseTexture();
-	matteMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMesh();*/
-
-	/*model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMesh();*/
-
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(-7.0f, 1.0f, 10.0f));
-	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat1.RenderModel();
-
-
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(7.0f, 1.0f, 10.0f));
-	//model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	boat2.RenderModel();
-
-	/*model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	plainTexture.UseTexture();
-	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMesh();*/
-
-	glUseProgram(0);
-}
-
-float boat1X = 2.0f, boat1Y = 0.5f, boat1Z = 10.f;
+float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
 float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
 float speed = 0.1f;
 bool bFirstRender = true;
@@ -502,13 +307,16 @@ bool bca = false, bcb = false;
 void RenderSceneTriTess() {
 	glm::mat4 model(1.0f);
 
-	float d1Z = -speed * deltaTime;
+	float d1X = -speed * deltaTime;
 	float d2Z = speed * deltaTime;
-	float newBoat1Z = boat1Z + d1Z;
+	float newBoat1X = boat1X + d1X;
 	float newBoat2Z = boat2Z + d2Z;
 
+	//cout << newBoat1X << endl;
+
 	glm::mat4 model1(1.0f);
-	model1 = glm::translate(model1, glm::vec3(boat1X, boat1Y, newBoat1Z));
+	model1 = glm::translate(model1, glm::vec3(newBoat1X, boat1Y, boat1Z));
+	model1 = glm::rotate(model1, glm::radians(90.f), glm::vec3(0, 1, 0));
 
 	glm::mat4 model2(1.0f);
 	model2 = glm::translate(model2, glm::vec3(boat2X, boat2Y, newBoat2Z));
@@ -518,20 +326,22 @@ void RenderSceneTriTess() {
 		meshList[0]->TransformCollider(model1);
 		meshList[1]->TransformCollider(model2);
 		bFirstRender = false;
-	}
+	} 
 	
 	else if(!bca && !bcb) {
-		meshList[0]->TranslateCollider(glm::vec3(0, 0, d1Z));
+		meshList[0]->TranslateCollider(glm::vec3(d1X, 0, 0));
 		meshList[1]->TranslateCollider(glm::vec3(0, 0, d2Z));
 	}
 
 	if (!bca && !bcb && !meshList[0]->IsColliding(meshList[1])) {
-		boat1Z = newBoat1Z;
+		boat1X = newBoat1X;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
 	}
 
 	else {
+		//cout << "else 1" << endl;
 		model = glm::translate(model, glm::vec3(boat1X, boat1Y, boat1Z));
+		model = glm::rotate(model, glm::radians(90.f), glm::vec3(0, 1, 0));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		bca = true;
 	}
@@ -547,6 +357,7 @@ void RenderSceneTriTess() {
 	}
 
 	else {
+		//cout << "else 1" << endl;
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(boat2X, boat2Y, boat2Z));
 		model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
@@ -562,15 +373,16 @@ void RenderSceneTriTess() {
 void RenderSceneQuadTess() { 
 	glm::mat4 model(1.f);
 
-	model = glm::translate(model, glm::vec3(boat1X, boat1Y, boat1Z - 2));
-	model = glm::rotate(model, glm::radians(180.f), glm::vec3(0, 1, 0));
+	model = glm::translate(model, glm::vec3(boat1X - 2, boat1Y, boat1Z));
+	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(0, 1, 0));
 	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
+	//model = glm::rotate(model, glm::radians(-90.f), glm::vec3(0, 0, 1));
 	//model = glm::rotate(model, glm::radians(180.f), glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	//brickTexture.UseTexture();
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[6]->RenderMeshPatches(bWireFrame);
+	meshList[4]->RenderMeshPatches(bWireFrame);
 
 
 	model = glm::mat4(1.f);
@@ -583,7 +395,7 @@ void RenderSceneQuadTess() {
 	//brickTexture.UseTexture();
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[7]->RenderMeshPatches(bWireFrame);
+	meshList[5]->RenderMeshPatches(bWireFrame);
 
 	//glUseProgram(0);
 }
@@ -594,7 +406,7 @@ void RenderAxes() {
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[5]->RenderMeshLines();
+	meshList[3]->RenderMeshLines();
 }
 
 void RenderOceanTess() {
@@ -605,7 +417,7 @@ void RenderOceanTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[4]->RenderMeshPatches(bWireFrame);
+	meshList[2]->RenderMeshPatches(bWireFrame);
 }
 
 void OmniShadowMapPass(PointLight* light) {
