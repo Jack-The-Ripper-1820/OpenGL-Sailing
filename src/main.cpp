@@ -22,18 +22,16 @@
 #include <Utils.hpp>
 #include <Material.hpp>
 #include <Constants.hpp>
-#include <Model.hpp>
 #include <Skybox.hpp>
-#include <WaterFrameBuffers.hpp>
-
-bool f = true;
 
 std::vector<Mesh*> meshList;
 
-std::vector<Shader*> shaderList;
+Shader pntShader;
+Shader pnqShader;
 Shader directionalShadowShader;
 Shader omniShadowShader;
-Shader oceanComputeShader;
+Shader waterShader;
+Shader axisShader;
 
 Skybox skyBox;
 
@@ -42,56 +40,37 @@ Camera camera;
 
 Material glossyMaterial, matteMaterial;
 
-Model boat1, boat2;
-
-Texture brickTexture;
-Texture dirtTexture;
+Texture woodTexture;
 Texture plainTexture;
 Texture oceanTexture;
 
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
-SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
 float tessLevel = 1.f;
 
-bool direction = true;
-float triOffset = 0.0f;
-float triMaxOffset = 0.7f;
-float triIncrement = 0.0005f;
-float curAngle = 0.f;
-
-bool sizeDirection = true;
-
-float curSize = 0.4f;
-float maxSize = 0.8f;
-float minSize = 0.1f;
-
 float moveFactor = 0;
 
 static const char* vShader = "shaders/vertex.glsl";
-static const char* tcs = "shaders/tcs.glsl";
-static const char* tes = "shaders/tes.glsl";
 static const char* fShader = "shaders/fragment.glsl";
 static const char* pTtcs = "shaders/tri_tcs.glsl";
 static const char* pTtes = "shaders/tri_tes.glsl";
 static const char* ptv = "shaders/tess_vert.glsl";
 static const char* pQtcs = "shaders/quad_tcs.glsl";
 static const char* pQtes = "shaders/quad_tes.glsl";
-static const char* nurbsTcs = "shaders/nurbs_tcs.glsl";
-static const char* nurbsTes = "shaders/nurbs_tes.glsl";
 static const char* colVS = "shaders/color_vertex.glsl";
 static const char* colFS = "shaders/color_fragment.glsl";
 static const char* waterVert = "shaders/water_vert.glsl";
 static const char* waterFrag = "shaders/water_frag.glsl";
-static const char* oceanComp = "shaders/ocean_comp.glsl";
-
-float scalex = 1, scaley = 1;
+static const char* dirShadVert = "shaders/directional_shadow_map_vertex.glsl";
+static const char* dirShadFrag = "shaders/directional_shadow_map_fragment.glsl";
+static const char* oDirShadVert = "shaders/omni_directional_shadow_map_vertex.glsl";
+static const char* oDirShadGeom = "shaders/omni_directional_shadow_map_geometry.glsl";
+static const char* oDirShadFrag = "shaders/omni_directional_shadow_map_fragment.glsl";
 
 unsigned int pointLightCount = 0;
-unsigned int spotLightCount = 0;
 
 bool bWireFrame = false;
 
@@ -268,41 +247,30 @@ void CreateObjects() {
 }
 
 void CreateShaders() {
-	Shader* shaderPNT = new Shader();
-	shaderPNT->CreateFromFiles(ptv, pTtcs, pTtes, fShader);
-	shaderList.push_back(shaderPNT);
+	pntShader = Shader();
+	pntShader.CreateFromFiles(ptv, pTtcs, pTtes, fShader);
 
-	Shader* shaderPNQ = new Shader();
-	shaderPNQ->CreateFromFiles(ptv, pQtcs, pQtes, fShader);
-	shaderList.push_back(shaderPNQ);
+	pnqShader = Shader();
+	pnqShader.CreateFromFiles(ptv, pQtcs, pQtes, fShader);
 
-	Shader* shaderNurbs = new Shader();
-	shaderNurbs->CreateFromFiles(ptv, nurbsTcs, nurbsTes, fShader);
-	shaderList.push_back(shaderNurbs);
+	axisShader = Shader();
+	axisShader.CreateFromFiles(colVS, colFS);
 
-	Shader* axisShader = new Shader();
-	axisShader->CreateFromFiles(colVS, colFS);
-	shaderList.push_back(axisShader);
-
-	Shader* waterShader = new Shader();
-	waterShader->CreateFromFiles(waterVert, pTtcs, pTtes, waterFrag);
-	shaderList.push_back(waterShader);
-
-	oceanComputeShader = Shader();
-	oceanComputeShader.CreateFromFiles(oceanComp);
+	waterShader =  Shader();
+	waterShader.CreateFromFiles(waterVert, pTtcs, pTtes, waterFrag);
 
 	directionalShadowShader = Shader();
-	directionalShadowShader.CreateFromFiles("shaders/directional_shadow_map_vertex.glsl", "shaders/directional_shadow_map_fragment.glsl");
+	directionalShadowShader.CreateFromFiles(dirShadVert, dirShadFrag);
+
 	omniShadowShader = Shader();
-	omniShadowShader.CreateFromFiles("shaders/omni_directional_shadow_map_vertex.glsl", "shaders/omni_directional_shadow_map_geometry.glsl",
-		"shaders/omni_directional_shadow_map_fragment.glsl");
+	omniShadowShader.CreateFromFiles(oDirShadVert, oDirShadGeom, oDirShadFrag);
 }
 
 float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
 float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
 float speed = 0.1f;
 bool bFirstRender = true;
-bool bca = false, bcb = false;
+bool bCollidedBoat1 = false, bCollidedBoat2 = false;
 
 void RenderSceneTriTess() {
 	glm::mat4 model(1.0f);
@@ -312,8 +280,6 @@ void RenderSceneTriTess() {
 	float newBoat1X = boat1X + d1X;
 	float newBoat2Z = boat2Z + d2Z;
 
-	//cout << newBoat1X << endl;
-
 	glm::mat4 model1(1.0f);
 	model1 = glm::translate(model1, glm::vec3(newBoat1X, boat1Y, boat1Z));
 	model1 = glm::rotate(model1, glm::radians(90.f), glm::vec3(0, 1, 0));
@@ -322,50 +288,48 @@ void RenderSceneTriTess() {
 	model2 = glm::translate(model2, glm::vec3(boat2X, boat2Y, newBoat2Z));
 	model2 = glm::rotate(model2, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
 
-	if (bFirstRender && !bca && !bcb) {
+	if (bFirstRender && !bCollidedBoat1 && !bCollidedBoat2) {
 		meshList[0]->TransformCollider(model1);
 		meshList[1]->TransformCollider(model2);
 		bFirstRender = false;
 	} 
 	
-	else if(!bca && !bcb) {
+	else if(!bCollidedBoat1 && !bCollidedBoat2) {
 		meshList[0]->TranslateCollider(glm::vec3(d1X, 0, 0));
 		meshList[1]->TranslateCollider(glm::vec3(0, 0, d2Z));
 	}
 
-	if (!bca && !bcb && !meshList[0]->IsColliding(meshList[1])) {
+	if (!bCollidedBoat1 && !bCollidedBoat2 && !meshList[0]->IsColliding(meshList[1])) {
 		boat1X = newBoat1X;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
 	}
 
 	else {
-		//cout << "else 1" << endl;
 		model = glm::translate(model, glm::vec3(boat1X, boat1Y, boat1Z));
 		model = glm::rotate(model, glm::radians(90.f), glm::vec3(0, 1, 0));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		bca = true;
+		bCollidedBoat1 = true;
 	}
 
-	brickTexture.UseTexture();
+	woodTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[0]->RenderMeshPatches(bWireFrame);
 
 
-	if(!bca && !bcb && !meshList[1]->IsColliding(meshList[0])) {
+	if(!bCollidedBoat1 && !bCollidedBoat2 && !meshList[1]->IsColliding(meshList[0])) {
 		boat2Z = newBoat2Z;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model2));
 	}
 
 	else {
-		//cout << "else 1" << endl;
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(boat2X, boat2Y, boat2Z));
 		model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		bcb = true;
+		bCollidedBoat2 = true;
 	}
 
-	brickTexture.UseTexture();
+	woodTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[1]->RenderMeshPatches(bWireFrame);
 }
@@ -376,10 +340,7 @@ void RenderSceneQuadTess() {
 	model = glm::translate(model, glm::vec3(boat1X - 2, boat1Y, boat1Z));
 	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(0, 1, 0));
 	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
-	//model = glm::rotate(model, glm::radians(-90.f), glm::vec3(0, 0, 1));
-	//model = glm::rotate(model, glm::radians(180.f), glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//brickTexture.UseTexture();
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[4]->RenderMeshPatches(bWireFrame);
@@ -389,15 +350,10 @@ void RenderSceneQuadTess() {
 
 	model = glm::translate(model, glm::vec3(boat2X, boat2Y, boat2Z + 2));
 	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1.f, 0.f, 0.f));
-	//model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
-	//model = glm::rotate(model, glm::radians(90.f), glm::vec3(1, 0, 0));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	//brickTexture.UseTexture();
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	meshList[5]->RenderMeshPatches(bWireFrame);
-
-	//glUseProgram(0);
 }
 
 void RenderAxes() {
@@ -473,11 +429,11 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 clip
 	skyBox.DrawSkybox(viewMatrix, projectionMatrix);
 
 	//axes
-	shaderList[3]->UseShader();
+	axisShader.UseShader();
 
-	uniformModel = shaderList[3]->GetModelLocation();
-	uniformProjection = shaderList[3]->GetProjectionLocation();
-	uniformView = shaderList[3]->GetViewLocation();
+	uniformModel = axisShader.GetModelLocation();
+	uniformProjection = axisShader.GetProjectionLocation();
+	uniformView = axisShader.GetViewLocation();
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -490,150 +446,127 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, glm::vec4 clip
 	// pn triangles
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-	shaderList[0]->UseShader();
+	pntShader.UseShader();
 
-	uniformModel = shaderList[0]->GetModelLocation();
-	uniformProjection = shaderList[0]->GetProjectionLocation();
-	uniformView = shaderList[0]->GetViewLocation();
-	uniformEyePosition = shaderList[0]->GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[0]->GetSpecularIntensityLocation();
-	uniformShininess = shaderList[0]->GetShininessLocation();
-	uniformTessellationLevel = shaderList[0]->GetTesslationLevelLocation();
+	uniformModel = pntShader.GetModelLocation();
+	uniformProjection = pntShader.GetProjectionLocation();
+	uniformView = pntShader.GetViewLocation();
+	uniformEyePosition = pntShader.GetEyePositionLocation();
+	uniformSpecularIntensity = pntShader.GetSpecularIntensityLocation();
+	uniformShininess = pntShader.GetShininessLocation();
+	uniformTessellationLevel = pntShader.GetTesslationLevelLocation();
 
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	
-	shaderList[0]->SetTessellationLevel(tessLevel);
+	pntShader.SetTessellationLevel(tessLevel);
 
-	shaderList[0]->SetDirectionalLight(&mainLight);
-	//shaderList[0]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	//shaderList[0]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	pntShader.SetDirectionalLight(&mainLight);
+	pntShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	auto lightTansform = mainLight.CalcLightTransform();
-	shaderList[0]->SetDirectionalLightTransform(&lightTansform);
+	pntShader.SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	shaderList[0]->SetTexture(1);
-	shaderList[0]->SetDirectionalShadowMap(2);
+	pntShader.SetTexture(1);
+	pntShader.SetDirectionalShadowMap(2);
 
-	glm::vec3 lowerLight = camera.getCameraPosition();
-	lowerLight.y -= 0.3f;
-	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+	pntShader.SetClipPlane(clipPlane);
 
-	shaderList[0]->SetClipPlane(clipPlane);
-
-	shaderList[0]->Validate();
+	pntShader.Validate();
 
 	RenderSceneTriTess();
-	//RenderSceneQuadTess();
 
 	glUseProgram(0);
 
 	// pn quads
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	shaderList[1]->UseShader();
+	pnqShader.UseShader();
 
-	uniformModel = shaderList[1]->GetModelLocation();
-	uniformProjection = shaderList[1]->GetProjectionLocation();
-	uniformView = shaderList[1]->GetViewLocation();
-	uniformEyePosition = shaderList[1]->GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[1]->GetSpecularIntensityLocation();
-	uniformShininess = shaderList[1]->GetShininessLocation();
-	uniformTessellationLevel = shaderList[1]->GetTesslationLevelLocation();
+	uniformModel = pnqShader.GetModelLocation();
+	uniformProjection = pnqShader.GetProjectionLocation();
+	uniformView = pnqShader.GetViewLocation();
+	uniformEyePosition = pnqShader.GetEyePositionLocation();
+	uniformSpecularIntensity = pnqShader.GetSpecularIntensityLocation();
+	uniformShininess = pnqShader.GetShininessLocation();
+	uniformTessellationLevel = pnqShader.GetTesslationLevelLocation();
 
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-	shaderList[1]->SetTessellationLevel(tessLevel);
+	pnqShader.SetTessellationLevel(tessLevel);
 
-	shaderList[1]->SetDirectionalLight(&mainLight);
-	shaderList[1]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	shaderList[1]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	pnqShader.SetDirectionalLight(&mainLight);
+	pnqShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	lightTansform = mainLight.CalcLightTransform();
-	shaderList[1]->SetDirectionalLightTransform(&lightTansform);
+	pnqShader.SetDirectionalLightTransform(&lightTansform);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	shaderList[1]->SetTexture(1);
-	shaderList[1]->SetDirectionalShadowMap(2);
+	pnqShader.SetTexture(1);
+	pnqShader.SetDirectionalShadowMap(2);
 
-	lowerLight = camera.getCameraPosition();
-	lowerLight.y -= 0.3f;
-	spotLights[1].SetFlash(lowerLight, camera.getCameraDirection());
 
-	shaderList[1]->SetClipPlane(clipPlane);
+	pnqShader.SetClipPlane(clipPlane);
 
-	shaderList[1]->Validate();
+	pnqShader.Validate();
 
-	//RenderSceneTriTess();
 	RenderSceneQuadTess();
 
 	glUseProgram(0);
 }
 
 
-void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, WaterFrameBuffers &waterFBO) {
+void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-	shaderList[4]->UseShader();
+	waterShader.UseShader();
 
-	uniformModel = shaderList[4]->GetModelLocation();
-	uniformProjection = shaderList[4]->GetProjectionLocation();
-	uniformView = shaderList[4]->GetViewLocation();
-	uniformEyePosition = shaderList[4]->GetEyePositionLocation();
-	uniformSpecularIntensity = shaderList[4]->GetSpecularIntensityLocation();
-	uniformShininess = shaderList[4]->GetShininessLocation();
-	uniformTessellationLevel = shaderList[4]->GetTesslationLevelLocation();
-	uniformTime = shaderList[4]->GetTime();
+	uniformModel = waterShader.GetModelLocation();
+	uniformProjection = waterShader.GetProjectionLocation();
+	uniformView = waterShader.GetViewLocation();
+	uniformEyePosition = waterShader.GetEyePositionLocation();
+	uniformSpecularIntensity = waterShader.GetSpecularIntensityLocation();
+	uniformShininess = waterShader.GetShininessLocation();
+	uniformTessellationLevel = waterShader.GetTesslationLevelLocation();
+	uniformTime = waterShader.GetTime();
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-	shaderList[4]->SetTime(glfwGetTime());
+	waterShader.SetTime(glfwGetTime());
 
-	shaderList[4]->SetTessellationLevel(16);
+	waterShader.SetTessellationLevel(16);
 
-	shaderList[4]->SetDirectionalLight(&mainLight);
-	//shaderList[4]->SetPointLights(pointLights, pointLightCount, 3, 0);
-	//shaderList[4]->SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
+	waterShader.SetDirectionalLight(&mainLight);
+	waterShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	auto lightTansform = mainLight.CalcLightTransform();
-	shaderList[4]->SetDirectionalLightTransform(&lightTansform);
+	waterShader.SetDirectionalLightTransform(&lightTansform);
 	
 	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
 	moveFactor = fmod(moveFactor, 1.0);
 
-	shaderList[4]->SetMoveFactor(moveFactor);
+	waterShader.SetMoveFactor(moveFactor);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
-	//waterFBO.ReadTextures();
 
-	shaderList[4]->SetTexture(1);
-	shaderList[4]->SetDirectionalShadowMap(2);
+	waterShader.SetTexture(1);
+	waterShader.SetDirectionalShadowMap(2);
 
-	//shaderList[4]->SetReflectionTexture(3);
-	//shaderList[4]->SetRefractionTexture(4);
-
-	auto lowerLight = camera.getCameraPosition();
-	lowerLight.y -= 0.3f;
-	spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-
-	shaderList[4]->Validate();
+	waterShader.Validate();
 
 	RenderOceanTess();
 
 	glUseProgram(0);
 }
 
-void UpdateOceanVerts() {
-	
-}
 
 int main() {
-	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); // 1280, 1024 or 1024, 768
+	mainWindow = Window(DISPLAY_WIDTH, DISPLAY_HEIGHT); 
 	mainWindow.Initialize();
 
 	CreateShaders();
@@ -642,10 +575,8 @@ int main() {
 
 	camera = Camera(glm::vec3(-3.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
-	brickTexture = Texture("textures/brick.png");
-	brickTexture.LoadTextureA();
-	dirtTexture = Texture("textures/dirt.png");
-	dirtTexture.LoadTextureA();
+	woodTexture = Texture("textures/Wood.jfif");
+	woodTexture.LoadTexture();
 	plainTexture = Texture("textures/plain.png");
 	plainTexture.LoadTextureA();
 	oceanTexture = Texture("textures/ocean.png");
@@ -653,12 +584,6 @@ int main() {
 
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
-
-	boat1 = Model(1);
-	boat1.LoadModel("models/boat.obj");
-
-	boat2 = Model(2);
-	boat2.LoadModel("models/boat.obj");
 
 	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
 		glm::clamp(206.f, 0.f, 1.f),
@@ -681,30 +606,6 @@ int main() {
 
 	pointLightCount++;
 
-	spotLights[0] = SpotLight(
-		0.635, 0.482, 0.933,
-		0.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		20.0f,
-		1024, 1024,
-		0.1f, 100.0f);
-
-	spotLightCount++;
-
-	spotLights[1] = SpotLight(
-		0.400, 0.600, 1.000,
-		0.0f, 1.0f,
-		0.0f, -1.5f, 0.0f,
-		-100.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		20.0f,
-		1024, 1024,
-		0.1f, 100.0f);
-
-	spotLightCount++;
-
 	std::vector<std::string> skyBoxFaces;
 
 
@@ -720,9 +621,6 @@ int main() {
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 
-	WaterFrameBuffers waterFBO = WaterFrameBuffers();
-
-	// Loop until window closed
 	while (!mainWindow.getShouldClose()) {
 		GLfloat now = glfwGetTime();
 		deltaTime = now - lastTime;
@@ -734,11 +632,6 @@ int main() {
 
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
-
-		if (mainWindow.getKeys()[GLFW_KEY_L]) {
-			spotLights[0].Toggle();
-			mainWindow.getKeys()[GLFW_KEY_L] = false;
-		}
 
 		if (mainWindow.getKeys()[GLFW_KEY_UP]) {
 			tessLevel = std::min(tessLevel + 1, 16.f);
@@ -761,38 +654,10 @@ int main() {
 			OmniShadowMapPass(&pointLights[i]);
 		}
 
-		for (size_t i = 0; i < spotLightCount; i++) {
-			OmniShadowMapPass(&spotLights[i]);
-		}
-
-		UpdateOceanVerts();
-
-		/*glEnable(GL_CLIP_DISTANCE0);
-
-		waterFBO.BindReflectionFrameBuffer();
-		
-		glm::vec3 cameraPos = camera.getCameraPosition();
-		float distance = 2 * cameraPos.y - 15;
-		cameraPos.y -= distance;
-		camera.setCameraPosition(cameraPos);
-		camera.invertPitch();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
-		
-		waterFBO.UnbindCurrentFrameBuffer();
-
-		cameraPos.y += distance;
-		camera.setCameraPosition(cameraPos);
-		camera.invertPitch();
-
-		waterFBO.BindRefractionFrameBuffer();
-		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 15 });
-		waterFBO.UnbindCurrentFrameBuffer();*/
-
-
 		glDisable(GL_CLIP_DISTANCE0);
 
 		RenderPass(camera.calculateViewMatrix(), projection, { 0, -1, 0, 10000 });
-		OceanRenderPass(camera.calculateViewMatrix(), projection, waterFBO);
+		OceanRenderPass(camera.calculateViewMatrix(), projection);
 
 		glUseProgram(0);
 
