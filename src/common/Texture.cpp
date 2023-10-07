@@ -31,8 +31,6 @@ bool Texture::LoadTexture()
 		return false;
 	}
 
-	//printf("found texture: %s \n", fileLocation);
-
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -89,7 +87,6 @@ void Texture::UseTexture()
 {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	//printf("%d \n", textureID);
 }
 
 void Texture::ClearTexture()
