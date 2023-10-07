@@ -12,7 +12,6 @@
 #include <Constants.hpp>
 #include <DirectionalLight.hpp>
 #include <PointLight.hpp>
-#include <SpotLight.hpp>
 
 class Shader {
 public:
@@ -23,7 +22,6 @@ public:
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* tessControlLocation, const char* tessEvalLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* computeLocation);
-	//void RunComputeShader(GLfloat* inputData, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 
 	void Validate();
 
@@ -48,7 +46,6 @@ public:
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
-	void SetSpotLights(SpotLight* spotLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
 	void SetDirectionalShadowMap(GLuint textureUnit);
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalLightTransform(glm::mat4* lightTransform);
@@ -71,7 +68,6 @@ private:
 	GLuint shaderID, uniformProjection, uniformModel, uniformView,
 		uniformEyePosition, uniformSpecularIntensity, uniformShininess,
 		uniformPointLightCount,
-		uniformSpotLightCount,
 		uniformDirectionalShadowMap,
 		uniformDirectionalLightTransform,
 		uniformTexture,
@@ -104,22 +100,9 @@ private:
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
 	struct {
-		GLuint uniformColor;
-		GLuint uniformAmbientIntensity;;
-		GLuint uniformDiffuseIntensity;
-		GLuint uniformPosition;
-		GLuint uniformConstant;
-		GLuint uniformLinear;
-		GLuint uniformExponent;
-
-		GLuint uniformDirection;
-		GLuint uniformEdgeAngle;
-	} uniformSpotLight[MAX_SPOT_LIGHTS];
-
-	struct {
 		GLuint uniformShadowMap;
 		GLuint uniformFarPlane;
-	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS];
 
 	void CompileProgram();
 	void CompileShader(const char* vertexCode, const char* fragmentCode);

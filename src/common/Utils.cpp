@@ -74,15 +74,6 @@ void Utils::calcAverageNormalForQuads(unsigned int* indices, unsigned int indexC
 		vertices[in3 + 1] += normal.y;
 		vertices[in3 + 2] += normal.z;
 
-		//	// Apply the normal to all four vertices of the quad
-		//	unsigned int indices[] = { in0, in1, in2, in3 };
-		//	for (int j = 0; j < 4; ++j) {
-		//		unsigned int idx = indices[j] + normalOffset;
-		//		vertices[idx] += normal.x;
-		//		vertices[idx + 1] += normal.y;
-		//		vertices[idx + 2] += normal.z;
-		//	}
-		//}
 	}
 
 	// Normalize the normal vectors

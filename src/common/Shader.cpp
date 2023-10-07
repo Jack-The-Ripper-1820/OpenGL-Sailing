@@ -196,24 +196,6 @@ void Shader::SetPointLights(PointLight* pointLight, unsigned int lightCount, uns
 	}
 }
 
-void Shader::SetSpotLights(SpotLight* spotLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset)
-{
-	if (lightCount > MAX_SPOT_LIGHTS) lightCount = MAX_SPOT_LIGHTS;
-
-	glUniform1i(uniformSpotLightCount, lightCount);
-
-	for (size_t i = 0; i < lightCount; i++) {
-		spotLight[i].UseLight(uniformSpotLight[i].uniformAmbientIntensity, uniformSpotLight[i].uniformColor,
-			uniformSpotLight[i].uniformDiffuseIntensity, uniformSpotLight[i].uniformPosition,
-			uniformSpotLight[i].uniformConstant, uniformSpotLight[i].uniformLinear, uniformSpotLight[i].uniformExponent,
-			uniformSpotLight[i].uniformDirection, uniformSpotLight[i].uniformEdgeAngle);
-	
-		spotLight[i].GetShadowMap()->Read(GL_TEXTURE0 + textureUnit + i);
-		glUniform1i(uniformOmniShadowMap[i + offset].uniformShadowMap, textureUnit + i);
-		glUniform1f(uniformOmniShadowMap[i + offset].uniformFarPlane, spotLight[i].GetFarPlane());
-	}
-}
-
 void Shader::SetDirectionalShadowMap(GLuint textureUnit)
 {
 	glUniform1i(uniformDirectionalShadowMap, textureUnit);
@@ -305,20 +287,6 @@ void Shader::CompileProgram()
 		uniformPointLight[i].uniformExponent = glGetUniformLocation(shaderID, std::format("pointLights[{}].exponent", i).c_str());
 	}
 
-	uniformSpotLightCount = glGetUniformLocation(shaderID, "spotLightCount");
-
-	for (size_t i = 0; i < MAX_SPOT_LIGHTS; i++) {
-		uniformSpotLight[i].uniformColor = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.color", i).c_str());
-		uniformSpotLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.ambientIntensity", i).c_str());
-		uniformSpotLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.base.diffuseIntensity", i).c_str());
-		uniformSpotLight[i].uniformPosition = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.position", i).c_str());
-		uniformSpotLight[i].uniformConstant = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.constant", i).c_str());
-		uniformSpotLight[i].uniformLinear = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.linear", i).c_str());
-		uniformSpotLight[i].uniformExponent = glGetUniformLocation(shaderID, std::format("spotLights[{}].base.exponent", i).c_str());
-		uniformSpotLight[i].uniformDirection = glGetUniformLocation(shaderID, std::format("spotLights[{}].direction", i).c_str());
-		uniformSpotLight[i].uniformEdgeAngle = glGetUniformLocation(shaderID, std::format("spotLights[{}].edgeAngle", i).c_str());
-	}
-
 	uniformTexture = glGetUniformLocation(shaderID, "theTexture");
 	uniformDirectionalLightTransform = glGetUniformLocation(shaderID, "directionalLightTransform");
 	uniformDirectionalShadowMap = glGetUniformLocation(shaderID, "directionalShadowMap");
@@ -330,7 +298,7 @@ void Shader::CompileProgram()
 		uniformLightMatrices[i] = glGetUniformLocation(shaderID, std::format("lightMatrices[{}]", i).c_str());
 	}
 
-	for (size_t i = 0; i < MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS; i++) {
+	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++) {
 		uniformOmniShadowMap[i].uniformShadowMap = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].shadowMap", i).c_str());
 		uniformOmniShadowMap[i].uniformFarPlane = glGetUniformLocation(shaderID, std::format("omniShadowMaps[{}].farPlane", i).c_str());
 	}
@@ -338,9 +306,6 @@ void Shader::CompileProgram()
 	uniformTessellationLevel = glGetUniformLocation(shaderID, "TessellationLevel");
 	uniformTime = glGetUniformLocation(shaderID, "time");
 	uniformClipPlane = glGetUniformLocation(shaderID, "clipPlane");
-
-	uniformReflectionTexture = glGetUniformLocation(shaderID, "reflectionTexture");
-	uniformRefractionTexture = glGetUniformLocation(shaderID, "refractionTexture");
 	uniformMoveFactor = glGetUniformLocation(shaderID, "moveFactor");
 }
 
@@ -444,8 +409,6 @@ void Shader::CompileShader(const char* computeCode)
 
 	glDetachShader(shaderID, shader);
 	glDeleteShader(shader);
-
-	std::cout << "shaderID: " << shaderID << std::endl;
 }
 
 GLuint Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
@@ -479,7 +442,6 @@ GLuint Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shade
 
 void Shader::UseShader() {
 	glUseProgram(0);
-	//std::cout << "using: " << shaderID << std::endl;
 	glUseProgram(shaderID);
 }
 

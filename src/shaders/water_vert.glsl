@@ -523,40 +523,13 @@ vec3 GerstnerWave(vec3 position, float time) {
     return vec3(position.x + displaceX, position.y + displaceY, position.z + displaceZ);
 }
 
-vec3 ComputeGerstnerNormal(vec3 position, float time) {
-    vec3 normal = vec3(0.0);
-
-    for (int i = 0; i < NUM_WAVES; i++) {
-        float waveFactor = D[i].x * position.x + D[i].y * position.z - S[i] * time;
-
-        // Compute the gradient of the Gerstner wave
-        float gradientX = Q * A[i] * cos(waveFactor);
-        float gradientY = -A[i] * sin(waveFactor);
-        float gradientZ = Q * A[i] * cos(waveFactor);
-
-        //// Add the contribution of each wave to the normal
-        //normal.x += gradientX;
-        //normal.y += gradientY;
-        //normal.z += gradientZ;
-
-        // Find a vector perpendicular to the gradient (cross product with an arbitrary vector)
-        vec3 tangent = normalize(vec3(gradientX, gradientY, gradientZ));
-        vec3 arbitraryVec = vec3(1.0, 0.0, 0.0);  // An arbitrary vector for the cross product
-        normal += normalize(cross(tangent, arbitraryVec));
-    }
-
-    // Normalize the resulting normal vector
-    return normalize(normal);
-}
-
 
 void main() {
     vec3 displacedPos =  GerstnerWave(pos, time);
     FragPos = vec3(model * vec4(displacedPos, 1.0));
-    //gl_Position = projection * view * vec4(FragPos, 1.0);
     vCol = vec4(clamp(col, 0.0, 1.0), 1.0);
     TexCoord = tex;
-    Normal = norm;
+    Normal = norm; 
 }
 
 
