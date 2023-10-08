@@ -540,7 +540,7 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	waterShader.SetTime(glfwGetTime());
 
-	waterShader.SetTessellationLevel(16);
+	waterShader.SetTessellationLevel(20.f);
 
 	waterShader.SetDirectionalLight(&mainLight);
 	waterShader.SetPointLights(pointLights, pointLightCount, 3, 0);
@@ -587,15 +587,15 @@ int main() {
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
-		glm::clamp(206.f, 0.f, 1.f),
-		glm::clamp(255.f, 0.f, 1.f));
+	glm::vec3 skyblue(glm::clamp(135.f * 0.8f, 0.f, 1.f),
+		glm::clamp(206.f * 0.8f, 0.f, 1.f),
+		glm::clamp(255.f * 0.8f, 0.f, 1.f));
 
 	mainLight = DirectionalLight(
 		skyblue.r, skyblue.g, skyblue.b,
 		0.6f, 0.9f,
 		//-10.0f, -12.0f, -18.5f,
-		-20.0f, -20.0f, 0.0f,
+		-20.0f, -20.0f, 18.5f,
 		2048, 2048);
 
 	pointLights[0] = PointLight(
@@ -636,7 +636,7 @@ int main() {
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		if (mainWindow.getKeys()[GLFW_KEY_UP]) {
-			tessLevel = std::min(tessLevel + 1, 16.f);
+			tessLevel = std::min(tessLevel + 1, 20.f);
 			mainWindow.getKeys()[GLFW_KEY_UP] = false;
 		}
 
