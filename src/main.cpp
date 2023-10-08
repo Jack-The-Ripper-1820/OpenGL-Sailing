@@ -533,7 +533,7 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	uniformShininess = waterShader.GetShininessLocation();
 	uniformTessellationLevel = waterShader.GetTesslationLevelLocation();
 	uniformTime = waterShader.GetTime();
-
+	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
@@ -546,7 +546,7 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	waterShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	auto lightTansform = mainLight.CalcLightTransform();
 	waterShader.SetDirectionalLightTransform(&lightTansform);
-	
+
 	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
 	moveFactor = fmod(moveFactor, 1.0);
 
@@ -556,6 +556,8 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	waterShader.SetTexture(1);
 	waterShader.SetDirectionalShadowMap(2);
+
+	waterShader.SetCameraPosition(camera.getCameraPosition());
 
 	waterShader.Validate();
 

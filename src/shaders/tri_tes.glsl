@@ -41,12 +41,14 @@ out vec4 vCol;
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
+out vec3 toCameraVec;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 directionalLightTransform;
 uniform vec4 clipPlane;
+uniform vec3 cameraPos;
 
 vec4 interpolate3D(vec4 v0, vec4 v1, vec4 v2)
 {
@@ -90,4 +92,10 @@ void main() {
     gl_ClipDistance[0] = dot(vec4(pos, 1.0), clipPlane);
 
     gl_Position = projection* view* model* vec4(pos, 1.0);
+
+    if (cameraPos != vec3(0, 0, 0))
+        toCameraVec = cameraPos - FragPos;
+
+    else
+        toCameraVec = vec3(0, 0, 0);
 }

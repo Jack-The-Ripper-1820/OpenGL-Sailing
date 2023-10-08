@@ -43,6 +43,7 @@ public:
 	GLuint GetTime();
 	GLuint GetClipPlaneLocation();
 	GLuint GetMoveFactorLocation();
+	GLuint GetCameraPositionLocation();
 
 	void SetDirectionalLight(DirectionalLight* directionalLight);
 	void SetPointLights(PointLight* pointLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
@@ -56,6 +57,7 @@ public:
 	void SetReflectionTexture(GLuint textureUnit);
 	void SetRefractionTexture(GLuint textureUnit);
 	void SetMoveFactor(float moveFactor);
+	void SetCameraPosition(glm::vec3 cameraPosition);
 
 	void UseShader();
 	void ClearShader();
@@ -78,7 +80,8 @@ private:
 		uniformClipPlane,
 		uniformReflectionTexture,
 		uniformRefractionTexture,
-		uniformMoveFactor;
+		uniformMoveFactor,
+		uniformCameraPosition;
 
 	GLuint uniformLightMatrices[6];
 

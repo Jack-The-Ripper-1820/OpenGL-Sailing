@@ -173,6 +173,11 @@ GLuint Shader::GetMoveFactorLocation()
 	return uniformMoveFactor;
 }
 
+GLuint Shader::GetCameraPositionLocation()
+{
+	return uniformCameraPosition;
+}
+
 void Shader::SetDirectionalLight(DirectionalLight* directionalLight)
 {
 	directionalLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor,
@@ -246,6 +251,11 @@ void Shader::SetRefractionTexture(GLuint textureUnit)
 void Shader::SetMoveFactor(float moveFactor)
 {
 	glUniform1f(uniformMoveFactor, moveFactor);
+}
+
+void Shader::SetCameraPosition(glm::vec3 cameraPosition)
+{
+	glUniform3f(uniformCameraPosition, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
 void Shader::CompileProgram()

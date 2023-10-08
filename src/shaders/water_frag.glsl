@@ -4,14 +4,13 @@ in vec4 vCol;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
-//in vec4 DirectionalLightSpacePos;
+in vec3 toCameraVec;
 
 out vec4 color;
 
 vec4 DirectionalLightSpacePos;
 
 const int MAX_POINT_LIGHTS = 3;
-const int MAX_SPOT_LIGHTS = 3;
 
 struct Light
 {
@@ -60,14 +59,12 @@ uniform int spotLightCount;
 
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
-uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-uniform OmniShadowMap omniShadowMaps[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
+uniform OmniShadowMap omniShadowMaps[MAX_POINT_LIGHTS];
 
 uniform sampler2D theTexture;
 uniform sampler2D directionalShadowMap;
-//uniform sampler2D reflectionTexture;
-//uniform sampler2D refractionTexture;
+
 
 uniform Material material;
 
@@ -192,23 +189,6 @@ vec4 CalcPointLight(PointLight pLight, int shadowIndex)
 	return (color / attenuation);
 }
 
-vec4 CalcSpotLight(SpotLight sLight, int shadowIndex)
-{
-	vec3 rayDirection = normalize(FragPos - sLight.base.position);
-	float slFactor = dot(rayDirection, sLight.direction);
-
-	if (slFactor > sLight.edgeAngle)
-	{
-		vec4 color = CalcPointLight(sLight.base, shadowIndex);
-
-		return color * (1.0f - (1.0f - slFactor) * (1.0f / (1.0f - sLight.edgeAngle)));
-
-	}
-	else {
-		return vec4(0, 0, 0, 0);
-	}
-}
-
 vec4 CalcPointLights()
 {
 	vec4 totalColor = vec4(0, 0, 0, 0);
@@ -220,27 +200,12 @@ vec4 CalcPointLights()
 	return totalColor;
 }
 
-vec4 CalcSpotLights()
-{
-	vec4 totalColor = vec4(0, 0, 0, 0);
-	for (int i = 0; i < spotLightCount; i++)
-	{
-		totalColor += CalcSpotLight(spotLights[i], i + pointLightCount);
-	}
-
-	return totalColor;
-}
-
 void main()
 {
 	DirectionalLightSpacePos = directionalLightTransform * model * vec4(FragPos, 1.0);
 
 	vec4 finalColor = CalcDirectionalLight(DirectionalLightSpacePos);
 	finalColor += CalcPointLights();
-	//finalColor += CalcSpotLights();
-
-	//vec4 reflectColor = texture(reflectionTexture, TexCoord);
-	//vec4 refractColor = texture(refractionTexture, TexCoord);
 
 	vec2 distortion1 = (texture(theTexture, vec2(TexCoord.x + moveFactor, TexCoord.y)).rg * 2.0 - 1.0) * waveStrength;
 	vec2 distortion2 = (texture(theTexture, vec2(-TexCoord.x + moveFactor, TexCoord.y + moveFactor)).rg * 2.0 - 1.0) * waveStrength;
@@ -254,8 +219,9 @@ void main()
 
 	vec4 newTexColor = texture(theTexture, newTexCoord);
 
-	color = newTexColor * vCol * finalColor;
-	color = newTexColor *  finalColor;
-	//color = mix(reflectColor, refractColor, 0.5) * finalColor;
+	//vec3 viewVec = normalize(toCameraVec);
+	//float fresnelFactor = 0;//dot(viewVec, vec3(0, 1, 0));
+	//fresnelFactor = pow(fresnelFactor, 5);
 
+	color = newTexColor * vCol * finalColor;
 }
