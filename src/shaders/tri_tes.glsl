@@ -41,7 +41,6 @@ out vec4 vCol;
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
-out vec3 toCameraVec;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -92,10 +91,4 @@ void main() {
     gl_ClipDistance[0] = dot(vec4(pos, 1.0), clipPlane);
 
     gl_Position = projection* view* model* vec4(pos, 1.0);
-
-    if (cameraPos != vec3(0, 0, 0))
-        toCameraVec = cameraPos - FragPos;
-
-    else
-        toCameraVec = vec3(0, 0, 0);
 }

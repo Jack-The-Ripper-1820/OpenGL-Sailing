@@ -4,7 +4,6 @@ in vec4 vCol;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
-in vec3 toCameraVec;
 
 out vec4 color;
 
@@ -218,10 +217,6 @@ void main()
 	newTexCoord.y = clamp(newTexCoord.y, 0.001, 0.999);
 
 	vec4 newTexColor = texture(theTexture, newTexCoord);
-
-	//vec3 viewVec = normalize(toCameraVec);
-	//float fresnelFactor = 0;//dot(viewVec, vec3(0, 1, 0));
-	//fresnelFactor = pow(fresnelFactor, 5);
 
 	color = newTexColor * vCol * finalColor;
 }

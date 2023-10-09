@@ -370,7 +370,7 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
+	model = glm::scale(model, glm::vec3(10.5f, 1.f, 10.f));
 	//model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
@@ -600,7 +600,7 @@ int main() {
 		-20.0f, -20.0f, 18.5f,
 		2048, 2048);
 
-	pointLights[0] = PointLight(
+	pointLights[0] = PointLight( 
 		0.400, 0.600, 1.000,
 		0.0f, 0.4f,
 		-2.0f, 2.0f, 0.0f,
