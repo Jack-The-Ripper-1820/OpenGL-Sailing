@@ -19,6 +19,8 @@ Please follow these steps to set up the project after downloading:
 
 ### For Users who cloned the repo
 
+** checkout to the root directory (diretory with the src folder) and in console (git installed) **
+
 ``` git submodule update --init --recursive ```
 
 ### For all users after the above steps
@@ -27,7 +29,7 @@ Please follow these steps to set up the project after downloading:
 
 
 ## Demo
-[![Demo](https://youtu.be/DXxmlrK-fiA?si=9z1eyJ1ijoSjMYIM.jpg)](https://youtu.be/DXxmlrK-fiA?si=9z1eyJ1ijoSjMYIM)
+[![Demo](thumbnail.webp)](https://youtu.be/DXxmlrK-fiA?si=9z1eyJ1ijoSjMYIM)
 
 
 
