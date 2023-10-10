@@ -9,9 +9,8 @@ Please follow these steps to set up the project after downloading:
 2. **Navigate to the project root:**  
    This is where the initialization script is located.
 
-3. **Run the appropriate script:**  
-   - For Windows:  
-     Double-click on `fetch_submodules.bat` or run it from the command prompt.
+3. **Run the appropriate script**
+   (./fetch_submodules.sh for Unix-like systems or fetch_submodules.bat for Windows) to download and initialize the submodules.
 
 
 **This will download and initialize the submodules for the project.**
@@ -30,6 +29,18 @@ Please follow these steps to set up the project after downloading:
 
 ## Demo
 [![Demo](thumbnail.webp)](https://youtu.be/DXxmlrK-fiA?si=9z1eyJ1ijoSjMYIM)
+
+
+## Application Controls
+
+1. WASD to move camera.
+
+2. Mouse/Touchpad to change camera orientation.
+
+3. B Key to toggle WireFrame Mode
+
+4. Arrow keys up/down to increase/decrease tessellation levels of the boats. 
+
 
 
 
