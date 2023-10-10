@@ -17,7 +17,11 @@ Please follow these steps to set up the project after downloading:
 **This will download and initialize the submodules for the project.**
 
 
-### For all users (zip users should follow the prior steps first)
+### For Users who cloned the repo
+
+``` git submodule update --init --recursive ```
+
+### For all users after the above steps
 
 **Open the project with Visual Studio(tested on VS2022) and run/save the CMakeLists.txt file (this should be automatic when you open with Visual Studio)**
 
