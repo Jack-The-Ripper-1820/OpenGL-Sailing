@@ -270,7 +270,7 @@ void CreateShaders() {
 
 float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
 float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
-float speed = 0.1f;
+float speed = 0.3f;
 bool bFirstRender = true;
 bool bCollidedBoat1 = false, bCollidedBoat2 = false;
 
@@ -370,7 +370,7 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(10.5f, 1.f, 10.f));
+	model = glm::scale(model, glm::vec3(20.f, 1.f, 20.f));
 	//model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
