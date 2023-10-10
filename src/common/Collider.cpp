@@ -31,7 +31,7 @@ void Collider::Translate(glm::vec3 const& dVector)
 
 
 bool Collider::NoOverlap(const glm::vec2& a, const glm::vec2& b) {
-	return a.y < b.x || b.y < a.x;
+	return a.y + 0.025 < b.x || b.y + 0.025 < a.x;
 }
 
 glm::vec2 Collider::Project(const std::vector<Edge>& hull, const glm::vec3& axis) {
