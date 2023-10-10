@@ -139,27 +139,29 @@ void CreateObjects() {
 		1.0, 0.25, 1.0, 1.0,1.0,1.0,  1.0,1.0,  0.0,0.0,0.0
 	};
 
+	 
+
 	GLfloat oceanVertices[] = {
 		//  x    y    z    r    g    b        u    v         nx    ny   nz
-		1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-		2.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0.25f, 0.0f, 0.0f, -1.0f, 0.0f,
-		3.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.0f, 0.0f, -1.0f, 0.0f,
-		4.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		-1.0f, 0.0f, -1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.25f, 0.0f, 0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, -1.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.0f, 0.0f, -1.0f, 0.0f,
+		2.0f, 0.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
 
-		1.0f, 0.0f, 2.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.25f, 0.0f, -1.0f, 0.0f,
-		2.0f, 0.0f, 2.0f,  1.0f, 1.0f, 1.0f, 0.25f, 0.25f, 0.0f, -1.0f, 0.0f,
-		3.0f, 0.0f, 2.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.25f, 0.0f, -1.0f, 0.0f,
-		4.0f, 0.0f, 2.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.25f, 0.0f, -1.0f, 0.0f,
+		-1.0f, 0.0f,  0.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.25f, 0.0f, -1.0f, 0.0f,
+		 0.0f, 0.0f,  0.0f, 1.0f, 1.0f, 1.0f, 0.25f, 0.25f, 0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f,  0.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.25f, 0.0f, -1.0f, 0.0f,
+		2.0f, 0.0f,  0.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.25f, 0.0f, -1.0f, 0.0f,
 
-		1.0f, 0.0f, 3.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.50f, 0.0f, -1.0f, 0.0f,
-		2.0f, 0.0f, 3.0f,  1.0f, 1.0f, 1.0f, 0.25f, 0.50f, 0.0f, -1.0f, 0.0f,
-		3.0f, 0.0f, 3.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.50f, 0.0f, -1.0f, 0.0f,
-		4.0f, 0.0f, 3.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.50f, 0.0f, -1.0f, 0.0f,
+		-1.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.50f, 0.0f, -1.0f, 0.0f,
+		0.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0.25f, 0.50f, 0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0.50f, 0.50f, 0.0f, -1.0f, 0.0f,
+		2.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.50f, 0.0f, -1.0f, 0.0f,
 
-		1.0f, 0.0f, 4.0f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-		2.0f, 0.0f, 4.0f,  1.0f, 1.0f, 1.0f, 0.25f, 1.0f, 0.0f, -1.0f, 0.0f,
-		3.0f, 0.0f, 4.0f,  1.0f, 1.0f, 1.0f, 0.50f, 1.0f, 0.0f, -1.0f, 0.0f,
-		4.0f, 0.0f, 4.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f
+		-1.0f, 0.0f,  2.0f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+		0.0f, 0.0f,  2.0f,  1.0f, 1.0f, 1.0f, 0.25f, 1.0f, 0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f,  2.0f,  1.0f, 1.0f, 1.0f, 0.50f, 1.0f, 0.0f, -1.0f, 0.0f,
+		2.0f, 0.0f,  2.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f
 	};
 
 
@@ -268,7 +270,7 @@ void CreateShaders() {
 
 float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
 float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
-float speed = 0.1f;
+float speed = 0.3f;
 bool bFirstRender = true;
 bool bCollidedBoat1 = false, bCollidedBoat2 = false;
 
@@ -368,8 +370,8 @@ void RenderAxes() {
 void RenderOceanTess() {
 	glm::mat4 model(1.0f);
 
-	model = glm::scale(model, glm::vec3(10.f, 1.f, 10.f));
-	model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
+	model = glm::scale(model, glm::vec3(20.f, 1.f, 20.f));
+	//model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -2.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -533,20 +535,20 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 	uniformShininess = waterShader.GetShininessLocation();
 	uniformTessellationLevel = waterShader.GetTesslationLevelLocation();
 	uniformTime = waterShader.GetTime();
-
+	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
 	waterShader.SetTime(glfwGetTime());
 
-	waterShader.SetTessellationLevel(16);
+	waterShader.SetTessellationLevel(20.f);
 
 	waterShader.SetDirectionalLight(&mainLight);
 	waterShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	auto lightTansform = mainLight.CalcLightTransform();
 	waterShader.SetDirectionalLightTransform(&lightTansform);
-	
+
 	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
 	moveFactor = fmod(moveFactor, 1.0);
 
@@ -556,6 +558,8 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	waterShader.SetTexture(1);
 	waterShader.SetDirectionalShadowMap(2);
+
+	waterShader.SetCameraPosition(camera.getCameraPosition());
 
 	waterShader.Validate();
 
@@ -585,18 +589,18 @@ int main() {
 	glossyMaterial = Material(4.0f, 256);
 	matteMaterial = Material(0.3f, 4);
 
-	glm::vec3 skyblue(glm::clamp(135.f, 0.f, 1.f),
-		glm::clamp(206.f, 0.f, 1.f),
-		glm::clamp(255.f, 0.f, 1.f));
+	glm::vec3 skyblue(glm::clamp(135.f * 0.8f, 0.f, 1.f),
+		glm::clamp(206.f * 0.8f, 0.f, 1.f),
+		glm::clamp(255.f * 0.8f, 0.f, 1.f));
 
 	mainLight = DirectionalLight(
 		skyblue.r, skyblue.g, skyblue.b,
 		0.6f, 0.9f,
 		//-10.0f, -12.0f, -18.5f,
-		-20.0f, -20.0f, 0.0f,
+		-20.0f, -20.0f, 18.5f,
 		2048, 2048);
 
-	pointLights[0] = PointLight(
+	pointLights[0] = PointLight( 
 		0.400, 0.600, 1.000,
 		0.0f, 0.4f,
 		-2.0f, 2.0f, 0.0f,
@@ -634,7 +638,7 @@ int main() {
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		if (mainWindow.getKeys()[GLFW_KEY_UP]) {
-			tessLevel = std::min(tessLevel + 1, 16.f);
+			tessLevel = std::min(tessLevel + 1, 20.f);
 			mainWindow.getKeys()[GLFW_KEY_UP] = false;
 		}
 

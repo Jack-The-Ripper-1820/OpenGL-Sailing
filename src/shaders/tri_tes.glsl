@@ -47,6 +47,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 directionalLightTransform;
 uniform vec4 clipPlane;
+uniform vec3 cameraPos;
 
 vec4 interpolate3D(vec4 v0, vec4 v1, vec4 v2)
 {
