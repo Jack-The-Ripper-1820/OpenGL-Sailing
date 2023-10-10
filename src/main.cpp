@@ -24,8 +24,6 @@
 #include <Constants.hpp>
 #include <Skybox.hpp>
 
-//std::vector<Mesh*> meshList;
-
 Shader pntShader;
 Shader pnqShader;
 Shader directionalShadowShader;
