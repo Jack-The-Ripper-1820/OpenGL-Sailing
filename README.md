@@ -18,7 +18,7 @@ Please follow these steps to set up the project after downloading:
 
 ### For Users who cloned the repo
 
-** checkout to the root directory (diretory with the src folder) and in console (git installed) **
+**Navigate to the root directory (diretory with the src folder) and in console (git installed)**
 
 ``` git submodule update --init --recursive ```
 
