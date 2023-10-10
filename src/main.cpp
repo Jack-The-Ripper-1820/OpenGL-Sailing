@@ -230,37 +230,10 @@ void CreateObjects() {
 
 	};
 
-	/*Utils::calcAverageNormal(boatIndices, 3 * 5, boatVertices, 5 * 11, 11, 8);
-	Utils::calcAverageNormal(oceanIndices, 18 * 3, oceanVertices, 11 * 16, 11, 8);
-	Utils::calcAverageNormalForQuads(sailIndices, 4, sailVertices, 11 * 4, 11, 8);
-	Utils::calcAverageNormalForQuads(sail2Indices, 4, sail2Vertices, 11 * 4, 11, 8);*/
-
 	Utils::calcAverageNormal(boatIndices, boatIndexCount, boatVertices, boatVertexCount, vertexSize, normalOffset);
 	Utils::calcAverageNormal(oceanIndices, oceanIndexCount, oceanVertices, oceanVertexCount, vertexSize, normalOffset);
 	Utils::calcAverageNormalForQuads(sailIndices, sailIndexCount, sailVertices, sailVertexCount, vertexSize, normalOffset);
 	Utils::calcAverageNormalForQuads(sail2Indices, sailIndexCount, sail2Vertices, sailVertexCount, vertexSize, normalOffset);
-
-
-	/*mBoat1 = new Mesh(0);
-	mBoat1->CreateMesh(boatVertices, boatIndices, 5 * 11, 3 * 5);
-	mBoat1->SetEdges(edges1);
-
-	mBoat2 = new Mesh(1);
-	mBoat2->CreateMesh(boatVertices, boatIndices, 5 * 11, 3 * 5);
-	mBoat2->SetEdges(edges2);
-
-	mOcean = new Mesh(2);
-	mOcean->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
-
-	mAxis = new Mesh(3);
-	mAxis->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
-
-	mSail1 = new Mesh(4);
-	mSail1->CreateMesh(sailVertices, sailIndices, 11 * 4, 4 * 1);
-
-	mSail2 = new Mesh(5);
-	mSail2->CreateMesh(sail2Vertices, sail2Indices, 11 * 4, 4 * 1);*/
-
 
 	mBoat1 = new Mesh(0);
 	mBoat1->CreateMesh(boatVertices, boatIndices, boatVertexCount, boatIndexCount);
