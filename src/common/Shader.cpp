@@ -248,9 +248,9 @@ void Shader::SetRefractionTexture(GLuint textureUnit)
 	glUniform1i(uniformRefractionTexture, textureUnit);
 }
 
-void Shader::SetMoveFactor(float moveFactor)
+void Shader::SetMoveFactor(float distortionMoveFactor)
 {
-	glUniform1f(uniformMoveFactor, moveFactor);
+	glUniform1f(uniformMoveFactor, distortionMoveFactor);
 }
 
 void Shader::SetCameraPosition(glm::vec3 cameraPosition)

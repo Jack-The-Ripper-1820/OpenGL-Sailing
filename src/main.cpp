@@ -24,7 +24,7 @@
 #include <Constants.hpp>
 #include <Skybox.hpp>
 
-std::vector<Mesh*> meshList;
+//std::vector<Mesh*> meshList;
 
 Shader pntShader;
 Shader pnqShader;
@@ -44,6 +44,13 @@ Texture woodTexture;
 Texture plainTexture;
 Texture oceanTexture;
 
+Mesh* mBoat1;
+Mesh* mBoat2;
+Mesh* mAxis;
+Mesh* mOcean;
+Mesh* mSail1;
+Mesh* mSail2;
+
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 
@@ -51,7 +58,7 @@ GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
 float tessLevel = 1.f;
 
-float moveFactor = 0;
+float distortionMoveFactor = 0;
 
 static const char* vShader = "shaders/vertex.glsl";
 static const char* fShader = "shaders/fragment.glsl";
@@ -80,8 +87,19 @@ uniformDirectionalLightTransform = 0,
 uniformOmniLightPos = 0, uniformFarPlane = 0, uniformTessellationLevel = 0,
 uniformTime = 0;
 
+
+float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
+float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
+bool bFirstRender = true;
+bool bCollidedBoat1 = false, bCollidedBoat2 = false;
+
 void CreateObjects() {
-	unsigned int indices[] = {
+	const unsigned int vertexSize = 11;
+	const unsigned int normalOffset = 8;
+
+	unsigned int boatIndexCount = 3 * 5;
+	
+	unsigned int boatIndices[] = {
 	0, 2, 1,
 	2, 4, 1,
 	4, 3, 1,
@@ -90,8 +108,9 @@ void CreateObjects() {
 	//4, 3, 0
 	};
 
+	unsigned int boatVertexCount = 5 * vertexSize;
 
-	GLfloat vertices[] = {
+	GLfloat boatVertices[] = {
 		//  x      y      z         r,g,b        u      v       nx,    ny,   nz
 			0.0f, 0.0f, -4.0f,     1,1,1,   0.5f, 1.0f,    0.0f, 0.0f, 0.0f,
 			-0.5f, 0.0f, -1.0f,      1,1,1,   0.25f, 0.5f,	  0.0f, 0.0f, 0.0f,
@@ -114,6 +133,8 @@ void CreateObjects() {
 
 	vector<pair<glm::vec3, glm::vec3>> edges2 = edges1;
 
+	unsigned int sailIndexCount = 4 * 1;
+
 	unsigned int sailIndices[] = {
 		0,1,2,3
 		//2,0,3
@@ -124,6 +145,7 @@ void CreateObjects() {
 		//2,0,3
 	};
 
+	unsigned int sailVertexCount = 4 * vertexSize;
 
 	GLfloat sailVertices[] = {
 		0.0, 0.0, 0.0,  1.0,1.0,1.0,  0.0,0.0,  0.0,0.0,0.0,
@@ -139,7 +161,7 @@ void CreateObjects() {
 		1.0, 0.25, 1.0, 1.0,1.0,1.0,  1.0,1.0,  0.0,0.0,0.0
 	};
 
-	 
+	unsigned int oceanVertexCount = 4 * 4 * vertexSize;
 
 	GLfloat oceanVertices[] = {
 		//  x    y    z    r    g    b        u    v         nx    ny   nz
@@ -164,6 +186,7 @@ void CreateObjects() {
 		2.0f, 0.0f,  2.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f
 	};
 
+	unsigned int oceanIndexCount = 18 * 3;
 
 	GLuint oceanIndices[] = {
 	0, 1, 5,
@@ -186,11 +209,15 @@ void CreateObjects() {
 	10, 15, 14
 	};
 
+	unsigned int axesIndexCount = 3 * 2;
+
 	unsigned int axesIndices[] = {
 		0, 1, // X-axis
 		2, 3, // Y-axis
 		4, 5  // Z-axis
 	};
+
+	unsigned int axesVertexCount = vertexSize * 6;
 
 	GLfloat axesVertices[] = {
 		// x   y      z     r      g     b     u    v    nx   ny   nz
@@ -203,49 +230,66 @@ void CreateObjects() {
 
 	};
 
-
-	Utils::calcAverageNormal(indices, 3 * 5, vertices, 5 * 11, 11, 8);
-
+	/*Utils::calcAverageNormal(boatIndices, 3 * 5, boatVertices, 5 * 11, 11, 8);
 	Utils::calcAverageNormal(oceanIndices, 18 * 3, oceanVertices, 11 * 16, 11, 8);
-
 	Utils::calcAverageNormalForQuads(sailIndices, 4, sailVertices, 11 * 4, 11, 8);
-	Utils::calcAverageNormalForQuads(sail2Indices, 4, sail2Vertices, 11 * 4, 11, 8);
+	Utils::calcAverageNormalForQuads(sail2Indices, 4, sail2Vertices, 11 * 4, 11, 8);*/
+
+	Utils::calcAverageNormal(boatIndices, boatIndexCount, boatVertices, boatVertexCount, vertexSize, normalOffset);
+	Utils::calcAverageNormal(oceanIndices, oceanIndexCount, oceanVertices, oceanVertexCount, vertexSize, normalOffset);
+	Utils::calcAverageNormalForQuads(sailIndices, sailIndexCount, sailVertices, sailVertexCount, vertexSize, normalOffset);
+	Utils::calcAverageNormalForQuads(sail2Indices, sailIndexCount, sail2Vertices, sailVertexCount, vertexSize, normalOffset);
 
 
-	Mesh* obj1 = new Mesh(0);
+	/*mBoat1 = new Mesh(0);
+	mBoat1->CreateMesh(boatVertices, boatIndices, 5 * 11, 3 * 5);
+	mBoat1->SetEdges(edges1);
 
-	obj1->CreateMesh(vertices, indices, 5 * 11, 3 * 5);
+	mBoat2 = new Mesh(1);
+	mBoat2->CreateMesh(boatVertices, boatIndices, 5 * 11, 3 * 5);
+	mBoat2->SetEdges(edges2);
 
-	obj1->SetEdges(edges1);
+	mOcean = new Mesh(2);
+	mOcean->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
 
-	Mesh* obj2 = new Mesh(1);
+	mAxis = new Mesh(3);
+	mAxis->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
 
-	obj2->CreateMesh(vertices, indices, 5 * 11, 3 * 5);
+	mSail1 = new Mesh(4);
+	mSail1->CreateMesh(sailVertices, sailIndices, 11 * 4, 4 * 1);
 
-	obj2->SetEdges(edges2);
-
-	Mesh* obj3 = new Mesh(4);
-	obj3->CreateMesh(oceanVertices, oceanIndices, 11 * 16, 18 * 3);
-
-	Mesh* obj4 = new Mesh(5);
-	obj4->CreateMesh(axesVertices, axesIndices, 11 * 6, 6);
-
-	Mesh* obj5 = new Mesh(6);
-
-	obj5->CreateMesh(sailVertices, sailIndices, 11 * 4, 4 * 1);
-
-	Mesh* obj6 = new Mesh(7);
-
-	obj6->CreateMesh(sail2Vertices, sail2Indices, 11 * 4, 4 * 1);
+	mSail2 = new Mesh(5);
+	mSail2->CreateMesh(sail2Vertices, sail2Indices, 11 * 4, 4 * 1);*/
 
 
-	meshList.push_back(obj1);
-	meshList.push_back(obj2);
-	meshList.push_back(obj3);
-	meshList.push_back(obj4);
-	meshList.push_back(obj5);
-	meshList.push_back(obj6);
+	mBoat1 = new Mesh(0);
+	mBoat1->CreateMesh(boatVertices, boatIndices, boatVertexCount, boatIndexCount);
+	mBoat1->SetEdges(edges1);
 
+	mBoat2 = new Mesh(1);
+	mBoat2->CreateMesh(boatVertices, boatIndices, boatVertexCount, boatIndexCount);
+	mBoat2->SetEdges(edges2);
+
+	mOcean = new Mesh(2);
+	mOcean->CreateMesh(oceanVertices, oceanIndices, oceanVertexCount, oceanIndexCount);
+
+	mAxis = new Mesh(3);
+	mAxis->CreateMesh(axesVertices, axesIndices, axesVertexCount, axesIndexCount);
+
+	mSail1 = new Mesh(4);
+	mSail1->CreateMesh(sailVertices, sailIndices, sailVertexCount, sailIndexCount);
+
+	mSail2 = new Mesh(5);
+	mSail2->CreateMesh(sail2Vertices, sail2Indices, sailVertexCount, sailIndexCount);
+}
+
+void DeleteMeshes() {
+	delete mBoat1;
+	delete mBoat2;
+	delete mAxis;
+	delete mOcean;
+	delete mSail1;
+	delete mSail2;
 }
 
 void CreateShaders() {
@@ -268,17 +312,13 @@ void CreateShaders() {
 	omniShadowShader.CreateFromFiles(oDirShadVert, oDirShadGeom, oDirShadFrag);
 }
 
-float boat1X = 12.0f, boat1Y = 0.5f, boat1Z = 2.f;
-float boat2X = 2.0f, boat2Y = 0.5f, boat2Z = -10.f;
-float speed = 0.3f;
-bool bFirstRender = true;
-bool bCollidedBoat1 = false, bCollidedBoat2 = false;
+
 
 void RenderSceneTriTess() {
 	glm::mat4 model(1.0f);
 
-	float d1X = -speed * deltaTime;
-	float d2Z = speed * deltaTime;
+	float d1X = -BOAT_SPEED * deltaTime;
+	float d2Z = BOAT_SPEED * deltaTime;
 	float newBoat1X = boat1X + d1X;
 	float newBoat2Z = boat2Z + d2Z;
 
@@ -291,17 +331,17 @@ void RenderSceneTriTess() {
 	model2 = glm::rotate(model2, glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
 
 	if (bFirstRender && !bCollidedBoat1 && !bCollidedBoat2) {
-		meshList[0]->TransformCollider(model1);
-		meshList[1]->TransformCollider(model2);
+		mBoat1->TransformCollider(model1);
+		mBoat2->TransformCollider(model2);
 		bFirstRender = false;
 	} 
 	
 	else if(!bCollidedBoat1 && !bCollidedBoat2) {
-		meshList[0]->TranslateCollider(glm::vec3(d1X, 0, 0));
-		meshList[1]->TranslateCollider(glm::vec3(0, 0, d2Z));
+		mBoat1->TranslateCollider(glm::vec3(d1X, 0, 0));
+		mBoat2->TranslateCollider(glm::vec3(0, 0, d2Z));
 	}
 
-	if (!bCollidedBoat1 && !bCollidedBoat2 && !meshList[0]->IsColliding(meshList[1])) {
+	if (!bCollidedBoat1 && !bCollidedBoat2 && !mBoat1->IsColliding(mBoat2)) {
 		boat1X = newBoat1X;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
 	}
@@ -315,10 +355,10 @@ void RenderSceneTriTess() {
 
 	woodTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[0]->RenderMeshPatches(bWireFrame);
+	mBoat1->RenderMeshPatches(bWireFrame);
 
 
-	if(!bCollidedBoat1 && !bCollidedBoat2 && !meshList[1]->IsColliding(meshList[0])) {
+	if(!bCollidedBoat1 && !bCollidedBoat2 && !mBoat2->IsColliding(mBoat1)) {
 		boat2Z = newBoat2Z;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model2));
 	}
@@ -333,7 +373,7 @@ void RenderSceneTriTess() {
 
 	woodTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[1]->RenderMeshPatches(bWireFrame);
+	mBoat2->RenderMeshPatches(bWireFrame);
 }
 
 void RenderSceneQuadTess() { 
@@ -345,7 +385,7 @@ void RenderSceneQuadTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[4]->RenderMeshPatches(bWireFrame);
+	mSail1->RenderMeshPatches(bWireFrame);
 
 
 	model = glm::mat4(1.f);
@@ -355,7 +395,7 @@ void RenderSceneQuadTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	plainTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[5]->RenderMeshPatches(bWireFrame);
+	mSail2->RenderMeshPatches(bWireFrame);
 }
 
 void RenderAxes() {
@@ -364,7 +404,7 @@ void RenderAxes() {
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[3]->RenderMeshLines();
+	mAxis->RenderMeshLines();
 }
 
 void RenderOceanTess() {
@@ -375,7 +415,7 @@ void RenderOceanTess() {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	oceanTexture.UseTexture();
 	glossyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	meshList[2]->RenderMeshPatches(bWireFrame);
+	mOcean->RenderMeshPatches(bWireFrame);
 }
 
 void OmniShadowMapPass(PointLight* light) {
@@ -542,17 +582,17 @@ void OceanRenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
 
 	waterShader.SetTime(glfwGetTime());
 
-	waterShader.SetTessellationLevel(20.f);
+	waterShader.SetTessellationLevel(WATER_TESSELLATION_LEVEL);
 
 	waterShader.SetDirectionalLight(&mainLight);
 	waterShader.SetPointLights(pointLights, pointLightCount, 3, 0);
 	auto lightTansform = mainLight.CalcLightTransform();
 	waterShader.SetDirectionalLightTransform(&lightTansform);
 
-	moveFactor += WAVE_SPEED * glfwGetTime() * 0.0001;
-	moveFactor = fmod(moveFactor, 1.0);
+	distortionMoveFactor += WAVE_SPEED * glfwGetTime() * DISTORTION_FACTOR_MULTIPLIER;
+	distortionMoveFactor = fmod(distortionMoveFactor, 1.0);
 
-	waterShader.SetMoveFactor(moveFactor);
+	waterShader.SetMoveFactor(distortionMoveFactor);
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
 
@@ -667,6 +707,8 @@ int main() {
 
 		mainWindow.swapBuffers();
 	}
+
+	DeleteMeshes();
 
 	return 0;
 }

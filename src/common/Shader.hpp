@@ -56,7 +56,7 @@ public:
 	void SetClipPlane(glm::vec4 clipPlane);
 	void SetReflectionTexture(GLuint textureUnit);
 	void SetRefractionTexture(GLuint textureUnit);
-	void SetMoveFactor(float moveFactor);
+	void SetMoveFactor(float distortionMoveFactor);
 	void SetCameraPosition(glm::vec3 cameraPosition);
 
 	void UseShader();
