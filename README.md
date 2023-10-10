@@ -24,8 +24,9 @@ Please follow these steps to set up the project after downloading:
 
 ### For all users after the above steps
 
-**Open the project with Visual Studio(tested on VS2022) and run/save the CMakeLists.txt file (this should be automatic when you open with Visual Studio)**
+1. **Open the project with Visual Studio(tested on VS2022) and run/save the CMakeLists.txt file (this should be automatic when you open with Visual Studio)**
 
+2. **Run the application by running main.cpp (In Folder view)**
 
 ## Demo
 [![Demo](thumbnail.webp)](https://youtu.be/DXxmlrK-fiA?si=9z1eyJ1ijoSjMYIM)
